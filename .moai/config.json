@@ -1,0 +1,18 @@
+{
+  "projectName": "yourfuture",
+  "projectType": "single",
+  "mode": "personal",
+  "locale": "ko",
+  "language": "javascript",
+  "framework": "vanilla",
+  "styling": "tailwind-cdn",
+  "automation": "python",
+  "test_framework": "manual",
+  "linter": "none",
+  "formatter": "none",
+  "coverage_target": 0,
+  "build_required": false,
+  "moai_adk_version": "0.3.12",
+  "optimized": true,
+  "updated": "2025-12-05"
+}
