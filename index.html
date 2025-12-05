@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>yourfuture - 국민연금 vs 개인연금 비교</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">
+      yourfuture
+    </h1>
+    <p class="text-center text-gray-600 mb-8">
+      국민연금 vs 개인연금, 똑같은 돈으로 뭐가 더 유리할까?
+    </p>
+
+    <!-- 데이터 로딩 상태 표시 -->
+    <div id="loading-status" class="text-center mb-4">
+      <span class="text-gray-500">데이터 로딩 중...</span>
+    </div>
+
+    <!-- 계산기 폼 (데이터 로드 후 활성화) -->
+    <div id="calculator-form" class="hidden">
+      <!-- TODO: UI-001에서 구현 -->
+    </div>
+  </div>
+
+  <script>
+    // ============================================================
+    // @CODE:DATA-001 | SPEC: SPEC-DATA-001/spec.md
+    // 데이터 파일 구조 및 로딩 시스템
+    // ============================================================
+
+    /**
+     * 전역 데이터 저장소
+     * @type {Object|null}
+     */
+    let APP_DATA = null;
+
+    /**
+     * 기본값 (폴백용)
+     * data.json 로드 실패 시 또는 필드 누락 시 사용
+     */
+    const DEFAULT_DATA = {
+      updated_at: "2025-01-01",
+      nps: {
+        a_value: 2989352,
+        replacement_rate: 0.40,
+        max_monthly_income: 5900000,
+        min_monthly_income: 370000
+      },
+      market: {
+        sp500_10yr_avg: 0.08,
+        kospi_10yr_avg: 0.05,
+        inflation_rate: 0.025
+      },
+      wage_curve: {
+        "20s": 0.05,
+        "30s": 0.05,
+        "40s": 0.03,
+        "50s_early": 0.00,
+        "50s_late": -0.02
+      }
+    };
+
+    /**
+     * data.json을 비동기로 로드하고 전역 변수에 저장
+     * @returns {Promise<Object>} 로드된 데이터 또는 기본값
+     */
+    async function loadData() {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+        const response = await fetch('./data.json', {
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        APP_DATA = validateData(data);
+        console.log('데이터 로드 완료:', APP_DATA.updated_at);
+        return APP_DATA;
+      } catch (error) {
+        if (error.name === 'AbortError') {
+          console.warn('data.json 로드 타임아웃 (5초), 기본값 사용');
+        } else {
+          console.warn('data.json 로드 실패, 기본값 사용:', error.message);
+        }
+        APP_DATA = { ...DEFAULT_DATA };
+        return APP_DATA;
+      }
+    }
+
+    /**
+     * 데이터 필드 검증 및 기본값 병합
+     * @param {Object} data - 로드된 JSON 데이터
+     * @returns {Object} 검증 및 기본값 병합된 데이터
+     */
+    function validateData(data) {
+      return {
+        updated_at: data.updated_at || DEFAULT_DATA.updated_at,
+        nps: { ...DEFAULT_DATA.nps, ...(data.nps || {}) },
+        market: { ...DEFAULT_DATA.market, ...(data.market || {}) },
+        wage_curve: { ...DEFAULT_DATA.wage_curve, ...(data.wage_curve || {}) }
+      };
+    }
+
+    /**
+     * 특정 데이터 조회 (점 표기법)
+     * @param {string} path - 점 표기법 경로 (예: "nps.a_value")
+     * @returns {*} 해당 경로의 값 또는 undefined
+     */
+    function getData(path) {
+      if (!APP_DATA || !path) return undefined;
+      const keys = path.split('.');
+      let value = APP_DATA;
+      for (const key of keys) {
+        if (value === null || value === undefined) return undefined;
+        value = value[key];
+      }
+      return value;
+    }
+
+    /**
+     * 계산 기능 활성화
+     * 데이터 로드 완료 후 UI 상태 업데이트
+     */
+    function enableCalculation() {
+      const loadingStatus = document.getElementById('loading-status');
+      const calculatorForm = document.getElementById('calculator-form');
+
+      if (loadingStatus) {
+        loadingStatus.innerHTML = `
+          <span class="text-green-600">
+            데이터 로드 완료 (${APP_DATA.updated_at} 기준)
+          </span>
+        `;
+      }
+
+      if (calculatorForm) {
+        calculatorForm.classList.remove('hidden');
+      }
+    }
+
+    /**
+     * 페이지 초기화
+     */
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadData();
+      enableCalculation();
+    });
+
+    // ============================================================
+    // @TEST:DATA-001 | SPEC: SPEC-DATA-001/spec.md
+    // 테스트 케이스 정의 (RED Phase)
+    // ============================================================
+
+    /**
+     * DATA-001 테스트 스위트
+     * 브라우저 콘솔에서 runTests() 실행
+     */
+    async function runTests() {
+      console.log('=== @TEST:DATA-001 테스트 시작 ===');
+      let passed = 0;
+      let failed = 0;
+
+      const tests = [
+        // TC-DATA-001-01: 함수 존재 여부
+        {
+          name: 'loadData 함수 존재',
+          test: () => typeof loadData === 'function'
+        },
+        {
+          name: 'validateData 함수 존재',
+          test: () => typeof validateData === 'function'
+        },
+        {
+          name: 'getData 함수 존재',
+          test: () => typeof getData === 'function'
+        },
+
+        // TC-DATA-001-02: 데이터 구조 검증
+        {
+          name: 'APP_DATA가 null이 아님',
+          test: () => APP_DATA !== null
+        },
+        {
+          name: 'nps.a_value가 숫자',
+          test: () => typeof APP_DATA?.nps?.a_value === 'number'
+        },
+        {
+          name: 'nps.a_value가 양수',
+          test: () => APP_DATA?.nps?.a_value > 0
+        },
+        {
+          name: 'nps.replacement_rate가 0~1 사이',
+          test: () => {
+            const rate = APP_DATA?.nps?.replacement_rate;
+            return rate >= 0 && rate <= 1;
+          }
+        },
+        {
+          name: 'market.sp500_10yr_avg가 숫자',
+          test: () => typeof APP_DATA?.market?.sp500_10yr_avg === 'number'
+        },
+        {
+          name: 'wage_curve.30s가 숫자',
+          test: () => typeof APP_DATA?.wage_curve?.['30s'] === 'number'
+        },
+        {
+          name: 'updated_at이 문자열',
+          test: () => typeof APP_DATA?.updated_at === 'string'
+        },
+
+        // TC-DATA-001-03: getData 함수 테스트
+        {
+          name: 'getData("nps.a_value") 동작',
+          test: () => getData('nps.a_value') === APP_DATA?.nps?.a_value
+        },
+        {
+          name: 'getData 잘못된 경로는 undefined',
+          test: () => getData('invalid.path') === undefined
+        }
+      ];
+
+      for (const t of tests) {
+        try {
+          const result = t.test();
+          if (result) {
+            console.log('%c✅ ' + t.name, 'color: green');
+            passed++;
+          } else {
+            console.log('%c❌ ' + t.name, 'color: red');
+            failed++;
+          }
+        } catch (e) {
+          console.log('%c❌ ' + t.name + ' - Error: ' + e.message, 'color: red');
+          failed++;
+        }
+      }
+
+      console.log(`=== 결과: ${passed}/${passed + failed} 통과 ===`);
+      return { passed, failed };
+    }
+
+    // 테스트를 전역에서 실행 가능하도록 노출
+    window.runTests = runTests;
+  </script>
+</body>
+</html>

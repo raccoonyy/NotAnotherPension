@@ -1,0 +1,21 @@
+{
+  "updated_at": "2025-12-05",
+  "nps": {
+    "a_value": 2989352,
+    "replacement_rate": 0.40,
+    "max_monthly_income": 5900000,
+    "min_monthly_income": 370000
+  },
+  "market": {
+    "sp500_10yr_avg": 0.10,
+    "kospi_10yr_avg": 0.05,
+    "inflation_rate": 0.025
+  },
+  "wage_curve": {
+    "20s": 0.05,
+    "30s": 0.05,
+    "40s": 0.03,
+    "50s_early": 0.00,
+    "50s_late": -0.02
+  }
+}
