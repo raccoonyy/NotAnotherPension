@@ -1,7 +1,7 @@
 ---
 id: DATA-001
-version: 0.0.1
-status: draft
+version: 0.1.0
+status: completed
 created: 2025-12-05
 updated: 2025-12-05
 author: @Alfred
@@ -27,6 +27,11 @@ scope:
 # @SPEC:DATA-001: 데이터 파일 구조 및 로딩 시스템
 
 ## HISTORY
+
+### v0.1.0 (2025-12-05)
+- **CHANGED**: TDD 구현 완료 (status: draft → completed)
+- **AUTHOR**: @Alfred
+- **REASON**: RED-GREEN-REFACTOR 사이클 완료
 
 ### v0.0.1 (2025-12-05)
 - **INITIAL**: data.json 구조 및 로딩 시스템 명세 작성
