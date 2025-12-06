@@ -157,6 +157,222 @@
     });
 
     // ============================================================
+    // @CODE:CALC-001 | SPEC: SPEC-CALC-001/spec.md
+    // 임금 상승 곡선 계산
+    // ============================================================
+
+    /**
+     * 연령대별 임금상승률 조회
+     * @param {number} age - 나이
+     * @returns {number} 해당 연령대의 임금상승률
+     */
+    function getWageGrowthRate(age) {
+      if (age < 30) return APP_DATA?.wage_curve?.['20s'] ?? 0.05;
+      if (age < 40) return APP_DATA?.wage_curve?.['30s'] ?? 0.05;
+      if (age < 50) return APP_DATA?.wage_curve?.['40s'] ?? 0.03;
+      if (age < 55) return APP_DATA?.wage_curve?.['50s_early'] ?? 0.00;
+      return APP_DATA?.wage_curve?.['50s_late'] ?? -0.02;
+    }
+
+    /**
+     * 연령별 예상 소득 계산 (임금 상승 곡선)
+     * @param {number} currentAge - 현재 나이 (20-59)
+     * @param {number} currentIncome - 현재 연소득 (원)
+     * @returns {Array<{age: number, year: number, income: number}>} 연도별 소득 배열
+     */
+    function calculateWageCurve(currentAge, currentIncome) {
+      // 입력 검증
+      if (currentAge < 20 || currentAge > 59) {
+        console.warn('나이는 20-59세 범위여야 합니다.');
+        return [];
+      }
+      if (currentIncome <= 0) {
+        console.warn('소득은 양수여야 합니다.');
+        return [];
+      }
+
+      const result = [];
+      const currentYear = new Date().getFullYear();
+      let income = currentIncome;
+
+      // 현재 나이부터 60세까지 계산
+      for (let age = currentAge; age <= 60; age++) {
+        const year = currentYear + (age - currentAge);
+        result.push({
+          age,
+          year,
+          income: Math.round(income)
+        });
+
+        // 60세 이전까지만 상승률 적용
+        if (age < 60) {
+          const growthRate = getWageGrowthRate(age);
+          income = income * (1 + growthRate);
+        }
+      }
+
+      return result;
+    }
+
+    // ============================================================
+    // @CODE:CALC-002 | SPEC: SPEC-CALC-002/spec.md
+    // 국민연금 예상 수령액 계산
+    // ============================================================
+
+    /** 국민연금 상수 */
+    const NPS_CONSTANTS = {
+      EMPLOYEE_RATE: 0.045,      // 근로자 본인 부담률
+      EMPLOYER_RATE: 0.045,      // 회사 부담률
+      SELF_EMPLOYED_RATE: 0.09,  // 사업자 부담률
+      FULL_MONTHS: 480           // 40년 = 480개월 (만액 기준)
+    };
+
+    /**
+     * 기준소득월액 산정 (상하한 적용)
+     * @param {number} annualIncome - 연소득
+     * @returns {number} 월 기준소득 (상하한 적용)
+     */
+    function getStandardMonthlyIncome(annualIncome) {
+      const monthlyIncome = annualIncome / 12;
+      const max = APP_DATA?.nps?.max_monthly_income ?? 5900000;
+      const min = APP_DATA?.nps?.min_monthly_income ?? 370000;
+      return Math.max(min, Math.min(max, monthlyIncome));
+    }
+
+    /**
+     * 국민연금 예상 월 수령액 계산
+     * @param {Array<{age: number, income: number}>} incomes - 연도별 소득 배열
+     * @param {string} jobType - 직업 유형 ('laborer' | 'business')
+     * @returns {{
+     *   monthlyBenefit: number,
+     *   totalContribution: number,
+     *   selfContribution: number,
+     *   employerContribution: number
+     * }}
+     */
+    function calculateNPS(incomes, jobType = 'laborer') {
+      if (!incomes || incomes.length === 0) {
+        return {
+          monthlyBenefit: 0,
+          totalContribution: 0,
+          selfContribution: 0,
+          employerContribution: 0
+        };
+      }
+
+      const aValue = APP_DATA?.nps?.a_value ?? 2989352;
+      const replacementRate = APP_DATA?.nps?.replacement_rate ?? 0.40;
+
+      // B값 계산: 본인의 기준소득월액 평균
+      let totalStandardIncome = 0;
+      let selfContribution = 0;
+      let employerContribution = 0;
+
+      for (const item of incomes) {
+        const standardMonthly = getStandardMonthlyIncome(item.income);
+        totalStandardIncome += standardMonthly * 12;
+
+        // 연간 보험료 계산
+        const annualContribution = standardMonthly * 12 * NPS_CONSTANTS.SELF_EMPLOYED_RATE;
+
+        if (jobType === 'laborer') {
+          selfContribution += annualContribution / 2;
+          employerContribution += annualContribution / 2;
+        } else {
+          selfContribution += annualContribution;
+        }
+      }
+
+      const bValue = totalStandardIncome / incomes.length; // 연평균 기준소득
+      const contributionMonths = incomes.length * 12;
+
+      // 국민연금 산식 (간소화): (A + B) × 소득대체율 × 가입월수/480 / 12
+      const monthlyBenefit = Math.round(
+        ((aValue + bValue) * replacementRate * (contributionMonths / NPS_CONSTANTS.FULL_MONTHS)) / 12
+      );
+
+      return {
+        monthlyBenefit,
+        totalContribution: Math.round(selfContribution + employerContribution),
+        selfContribution: Math.round(selfContribution),
+        employerContribution: Math.round(employerContribution)
+      };
+    }
+
+    // ============================================================
+    // @CODE:CALC-003 | SPEC: SPEC-CALC-003/spec.md
+    // 개인연금 복리 계산
+    // ============================================================
+
+    /** 개인연금 상품 정보 */
+    const PRIVATE_PENSION_PRODUCTS = [
+      { id: 'sp500', name: 'S&P500 ETF', return: 0.08, fee: 0.0003 },
+      { id: 'tdf2050', name: 'TDF 2050', return: 0.05, fee: 0.005 },
+      { id: 'savings', name: '예금형', return: 0.025, fee: 0 }
+    ];
+
+    /**
+     * 단일 상품 개인연금 계산
+     * @param {Array<{age: number, income: number}>} incomes - 연도별 소득 배열
+     * @param {Object} product - 상품 정보
+     * @returns {Object} 계산 결과
+     */
+    function calculateSinglePrivatePension(incomes, product) {
+      if (!incomes || incomes.length === 0) {
+        return {
+          productId: product.id,
+          productName: product.name,
+          totalContribution: 0,
+          totalBalance: 0,
+          monthlyBenefit: 0
+        };
+      }
+
+      const contributionRate = NPS_CONSTANTS.SELF_EMPLOYED_RATE; // 9%
+      const effectiveReturn = product.return - product.fee;
+
+      let totalContribution = 0;
+      let balance = 0;
+
+      for (const item of incomes) {
+        // 기준소득월액 기준 납입 (국민연금과 동일)
+        const standardMonthly = getStandardMonthlyIncome(item.income);
+        const annualContribution = standardMonthly * 12 * contributionRate;
+
+        // 복리 계산: 이전 잔액에 수익률 적용 후 당해 납입액 추가
+        balance = balance * (1 + effectiveReturn) + annualContribution;
+        totalContribution += annualContribution;
+      }
+
+      // 월 예상 수령액 (20년 분할)
+      const monthlyBenefit = Math.round(balance / (20 * 12));
+
+      return {
+        productId: product.id,
+        productName: product.name,
+        totalContribution: Math.round(totalContribution),
+        totalBalance: Math.round(balance),
+        monthlyBenefit
+      };
+    }
+
+    /**
+     * 개인연금 예상 적립액 계산 (여러 상품)
+     * @param {Array<{age: number, income: number}>} incomes - 연도별 소득 배열
+     * @param {Object} [product] - 특정 상품 (미지정 시 전체)
+     * @returns {Array} 상품별 계산 결과
+     */
+    function calculatePrivatePension(incomes, product = null) {
+      if (product) {
+        return [calculateSinglePrivatePension(incomes, product)];
+      }
+
+      return PRIVATE_PENSION_PRODUCTS.map(p =>
+        calculateSinglePrivatePension(incomes, p)
+      );
+    }
+
+    // ============================================================
     // @TEST:DATA-001 | SPEC: SPEC-DATA-001/spec.md
     // 테스트 케이스 정의 (RED Phase)
     // ============================================================
@@ -226,6 +442,156 @@
         {
           name: 'getData 잘못된 경로는 undefined',
           test: () => getData('invalid.path') === undefined
+        },
+
+        // ============================================================
+        // @TEST:CALC-001 | SPEC: SPEC-CALC-001/spec.md
+        // ============================================================
+        {
+          name: 'calculateWageCurve 함수 존재',
+          test: () => typeof calculateWageCurve === 'function'
+        },
+        {
+          name: 'getWageGrowthRate 함수 존재',
+          test: () => typeof getWageGrowthRate === 'function'
+        },
+        {
+          name: '30세 5000만원 → 31개 결과 반환',
+          test: () => calculateWageCurve(30, 50000000).length === 31
+        },
+        {
+          name: '첫 번째 결과가 현재 나이/소득',
+          test: () => {
+            const result = calculateWageCurve(30, 50000000);
+            return result[0]?.age === 30 && result[0]?.income === 50000000;
+          }
+        },
+        {
+          name: '30대 상승률 5% 적용',
+          test: () => {
+            const result = calculateWageCurve(30, 50000000);
+            return result[1]?.income === Math.round(50000000 * 1.05);
+          }
+        },
+        {
+          name: '잘못된 나이(15세) → 빈 배열',
+          test: () => calculateWageCurve(15, 50000000).length === 0
+        },
+        {
+          name: '잘못된 소득(음수) → 빈 배열',
+          test: () => calculateWageCurve(30, -1000).length === 0
+        },
+        {
+          name: '59세 → 2개 결과 (59, 60)',
+          test: () => calculateWageCurve(59, 50000000).length === 2
+        },
+
+        // ============================================================
+        // @TEST:CALC-002 | SPEC: SPEC-CALC-002/spec.md
+        // ============================================================
+        {
+          name: 'calculateNPS 함수 존재',
+          test: () => typeof calculateNPS === 'function'
+        },
+        {
+          name: 'getStandardMonthlyIncome 함수 존재',
+          test: () => typeof getStandardMonthlyIncome === 'function'
+        },
+        {
+          name: '빈 배열 → monthlyBenefit 0',
+          test: () => calculateNPS([]).monthlyBenefit === 0
+        },
+        {
+          name: '근로자 연금 계산 결과 양수',
+          test: () => {
+            const incomes = calculateWageCurve(30, 50000000);
+            const result = calculateNPS(incomes, 'laborer');
+            return result.monthlyBenefit > 0;
+          }
+        },
+        {
+          name: '근로자: selfContribution === employerContribution',
+          test: () => {
+            const incomes = calculateWageCurve(30, 50000000);
+            const result = calculateNPS(incomes, 'laborer');
+            return result.selfContribution === result.employerContribution;
+          }
+        },
+        {
+          name: '사업자: employerContribution === 0',
+          test: () => {
+            const incomes = calculateWageCurve(30, 50000000);
+            const result = calculateNPS(incomes, 'business');
+            return result.employerContribution === 0;
+          }
+        },
+        {
+          name: '기준소득월액 상한 적용 (590만원)',
+          test: () => {
+            const result = getStandardMonthlyIncome(100000000); // 연 1억
+            return result === 5900000;
+          }
+        },
+        {
+          name: '기준소득월액 하한 적용 (37만원)',
+          test: () => {
+            const result = getStandardMonthlyIncome(1000000); // 연 100만원
+            return result === 370000;
+          }
+        },
+
+        // ============================================================
+        // @TEST:CALC-003 | SPEC: SPEC-CALC-003/spec.md
+        // ============================================================
+        {
+          name: 'calculatePrivatePension 함수 존재',
+          test: () => typeof calculatePrivatePension === 'function'
+        },
+        {
+          name: 'PRIVATE_PENSION_PRODUCTS 상수 존재 (3개 상품)',
+          test: () => Array.isArray(PRIVATE_PENSION_PRODUCTS) && PRIVATE_PENSION_PRODUCTS.length === 3
+        },
+        {
+          name: '빈 배열 → 3개 상품 결과 (모두 0)',
+          test: () => {
+            const results = calculatePrivatePension([]);
+            return results.length === 3 && results.every(r => r.monthlyBenefit === 0);
+          }
+        },
+        {
+          name: '전체 상품 계산 → 3개 결과',
+          test: () => {
+            const incomes = calculateWageCurve(30, 50000000);
+            const results = calculatePrivatePension(incomes);
+            return results.length === 3;
+          }
+        },
+        {
+          name: 'S&P500 > TDF > 예금형 순서 (수익률)',
+          test: () => {
+            const incomes = calculateWageCurve(30, 50000000);
+            const results = calculatePrivatePension(incomes);
+            const sp500 = results.find(r => r.productId === 'sp500');
+            const tdf = results.find(r => r.productId === 'tdf2050');
+            const savings = results.find(r => r.productId === 'savings');
+            return sp500.totalBalance > tdf.totalBalance && tdf.totalBalance > savings.totalBalance;
+          }
+        },
+        {
+          name: '단일 상품 지정 → 1개 결과',
+          test: () => {
+            const incomes = calculateWageCurve(30, 50000000);
+            const results = calculatePrivatePension(incomes, PRIVATE_PENSION_PRODUCTS[0]);
+            return results.length === 1 && results[0].productId === 'sp500';
+          }
+        },
+        {
+          name: 'totalBalance > totalContribution (복리 효과)',
+          test: () => {
+            const incomes = calculateWageCurve(30, 50000000);
+            const results = calculatePrivatePension(incomes);
+            return results.every(r => r.totalBalance > r.totalContribution);
+          }
         }
       ];
 
