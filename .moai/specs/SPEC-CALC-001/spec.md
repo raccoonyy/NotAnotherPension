@@ -1,7 +1,7 @@
 ---
 id: CALC-001
-version: 0.0.1
-status: draft
+version: 0.1.0
+status: completed
 created: 2025-12-06
 updated: 2025-12-06
 author: @Alfred
