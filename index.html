@@ -20,9 +20,96 @@
       <span class="text-gray-500">데이터 로딩 중...</span>
     </div>
 
+    <!-- @CODE:UI-001 | SPEC: SPEC-UI-001/spec.md -->
     <!-- 계산기 폼 (데이터 로드 후 활성화) -->
-    <div id="calculator-form" class="hidden">
-      <!-- TODO: UI-001에서 구현 -->
+    <div id="calculator-form" class="hidden max-w-md mx-auto">
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <!-- 직업 구분 -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">직업 구분</label>
+          <div class="flex gap-4">
+            <label class="flex items-center cursor-pointer">
+              <input type="radio" name="jobType" value="laborer" checked
+                     class="w-4 h-4 text-blue-600" onchange="toggleJobType()">
+              <span class="ml-2 text-gray-700">근로자</span>
+            </label>
+            <label class="flex items-center cursor-pointer">
+              <input type="radio" name="jobType" value="business"
+                     class="w-4 h-4 text-blue-600" onchange="toggleJobType()">
+              <span class="ml-2 text-gray-700">사업자</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- 현재 나이 -->
+        <div class="mb-4">
+          <label for="currentAge" class="block text-sm font-medium text-gray-700 mb-2">
+            현재 나이
+          </label>
+          <div class="flex items-center">
+            <input type="number" id="currentAge" value="30" min="20" max="59"
+                   class="w-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <span class="ml-2 text-gray-600">세</span>
+          </div>
+        </div>
+
+        <!-- 근로자: 연봉 입력 -->
+        <div id="laborer-income" class="mb-4">
+          <label for="annualSalary" class="block text-sm font-medium text-gray-700 mb-2">
+            현재 연봉 (세전)
+          </label>
+          <div class="flex items-center">
+            <input type="number" id="annualSalary" value="5000" min="1"
+                   class="w-32 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <span class="ml-2 text-gray-600">만원</span>
+          </div>
+        </div>
+
+        <!-- 사업자: 월평균 사업소득 입력 -->
+        <div id="business-income" class="mb-4 hidden">
+          <label for="monthlyBusinessIncome" class="block text-sm font-medium text-gray-700 mb-2">
+            월평균 사업소득
+          </label>
+          <div class="flex items-center">
+            <input type="number" id="monthlyBusinessIncome" value="500" min="1"
+                   class="w-32 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <span class="ml-2 text-gray-600">만원</span>
+          </div>
+        </div>
+
+        <!-- 오류 메시지 -->
+        <div id="error-message" class="mb-4 hidden">
+          <p class="text-red-600 text-sm"></p>
+        </div>
+
+        <!-- 계산하기 버튼 -->
+        <button onclick="handleCalculate()"
+                class="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 transition-colors font-medium">
+          계산하기
+        </button>
+      </div>
+    </div>
+
+    <!-- @CODE:UI-002 | SPEC: SPEC-UI-002/spec.md -->
+    <!-- 결과 테이블 컨테이너 -->
+    <div id="result-container" class="hidden mt-8">
+      <!-- 요약 카드 -->
+      <div id="summary-cards" class="mb-8">
+        <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">60세 기준 월 예상 수령액 (세후)</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="summary-grid">
+          <!-- JavaScript로 동적 생성 -->
+        </div>
+      </div>
+
+      <!-- 연도별 상세 테이블 -->
+      <div class="bg-white rounded-lg shadow-md p-4">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">연도별 상세 내역</h3>
+        <div class="overflow-x-auto">
+          <table id="result-table" class="min-w-full text-sm">
+            <!-- JavaScript로 동적 생성 -->
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -373,6 +460,361 @@
     }
 
     // ============================================================
+    // @CODE:UI-002 | SPEC: SPEC-UI-002/spec.md
+    // 결과 테이블 로직
+    // ============================================================
+
+    /**
+     * 숫자를 한국 원화 형식으로 포맷
+     * @param {number} amount - 금액
+     * @param {string} unit - 단위 ('원' | '만원')
+     * @returns {string} 포맷된 금액
+     */
+    function formatCurrency(amount, unit = '만원') {
+      if (amount === 0 || amount === null || amount === undefined) {
+        return '-';
+      }
+
+      if (unit === '만원') {
+        const manwon = Math.round(amount / 10000);
+        return manwon.toLocaleString('ko-KR') + '만원';
+      }
+
+      return amount.toLocaleString('ko-KR') + '원';
+    }
+
+    /**
+     * 요약 카드 렌더링
+     * @param {Object} result - 계산 결과 객체
+     */
+    function renderSummaryCards(result) {
+      const grid = document.getElementById('summary-grid');
+      if (!grid) return;
+
+      const cards = [
+        {
+          title: '국민연금',
+          amount: result.nps.tax.netAmount,
+          color: 'blue',
+          tooltip: `세전: ${formatCurrency(result.nps.monthlyBenefit)}`
+        },
+        ...result.privatePensions.map((pp, index) => ({
+          title: pp.productName,
+          amount: pp.tax.netAmount,
+          color: index === 0 ? 'green' : index === 1 ? 'purple' : 'gray',
+          tooltip: `세전: ${formatCurrency(pp.monthlyBenefit)}`
+        }))
+      ];
+
+      grid.innerHTML = cards.map(card => `
+        <div class="bg-${card.color}-50 border border-${card.color}-200 rounded-lg p-4 text-center"
+             title="${card.tooltip}">
+          <div class="text-sm text-${card.color}-600 font-medium mb-1">${card.title}</div>
+          <div class="text-2xl font-bold text-${card.color}-800">${formatCurrency(card.amount)}</div>
+          <div class="text-xs text-${card.color}-500 mt-1">세후 월 수령액</div>
+        </div>
+      `).join('');
+    }
+
+    /**
+     * 결과 테이블 렌더링
+     * @param {Object} result - 계산 결과 객체
+     */
+    function renderResultTable(result) {
+      // 요약 카드 렌더링
+      renderSummaryCards(result);
+
+      const table = document.getElementById('result-table');
+      if (!table) return;
+
+      const incomes = result.incomes;
+      const jobType = result.formData.jobType;
+
+      // 헤더 행 생성
+      let headerRow = '<tr class="bg-gray-100"><th class="px-3 py-2 text-left font-medium text-gray-700 sticky left-0 bg-gray-100 min-w-[120px]">항목</th>';
+      for (const item of incomes) {
+        headerRow += `<th class="px-3 py-2 text-center font-medium text-gray-700 min-w-[100px]">${item.year}년<br><span class="text-xs text-gray-500">(${item.age}세)</span></th>`;
+      }
+      headerRow += '</tr>';
+
+      // 예상 소득 행
+      let incomeRow = '<tr class="border-b"><td class="px-3 py-2 font-medium text-gray-700 sticky left-0 bg-white">예상 소득</td>';
+      for (const item of incomes) {
+        incomeRow += `<td class="px-3 py-2 text-center text-gray-600">${formatCurrency(item.income)}</td>`;
+      }
+      incomeRow += '</tr>';
+
+      // 국민연금 납입액 행
+      let npsContribRow = '<tr class="border-b bg-blue-50"><td class="px-3 py-2 font-medium text-blue-700 sticky left-0 bg-blue-50">국민연금 납입</td>';
+      for (const item of incomes) {
+        const standardMonthly = getStandardMonthlyIncome(item.income);
+        const monthlyContrib = standardMonthly * (jobType === 'laborer' ? 0.045 : 0.09);
+        const selfMonthly = jobType === 'laborer' ? monthlyContrib : monthlyContrib;
+        npsContribRow += `<td class="px-3 py-2 text-center text-blue-600">${formatCurrency(selfMonthly * 12)}${jobType === 'laborer' ? '<br><span class="text-xs">(+회사 동일)</span>' : ''}</td>`;
+      }
+      npsContribRow += '</tr>';
+
+      // 국민연금 수령액 행 (60세에만 표시)
+      let npsReceiveRow = '<tr class="border-b bg-blue-100"><td class="px-3 py-2 font-medium text-blue-800 sticky left-0 bg-blue-100">국민연금 수령</td>';
+      for (const item of incomes) {
+        if (item.age === 60) {
+          npsReceiveRow += `<td class="px-3 py-2 text-center"><span class="font-bold text-blue-800">${formatCurrency(result.nps.tax.netAmount)}</span><br><span class="text-xs text-blue-600">세전: ${formatCurrency(result.nps.monthlyBenefit)}</span></td>`;
+        } else {
+          npsReceiveRow += '<td class="px-3 py-2 text-center text-gray-400">-</td>';
+        }
+      }
+      npsReceiveRow += '</tr>';
+
+      // 개인연금 수령액 행들
+      let privatePensionRows = '';
+      const colors = ['green', 'purple', 'gray'];
+      result.privatePensions.forEach((pp, index) => {
+        const color = colors[index];
+        privatePensionRows += `<tr class="border-b bg-${color}-50"><td class="px-3 py-2 font-medium text-${color}-700 sticky left-0 bg-${color}-50">${pp.productName}</td>`;
+        for (const item of incomes) {
+          if (item.age === 60) {
+            privatePensionRows += `<td class="px-3 py-2 text-center"><span class="font-bold text-${color}-800">${formatCurrency(pp.tax.netAmount)}</span><br><span class="text-xs text-${color}-600">세전: ${formatCurrency(pp.monthlyBenefit)}</span></td>`;
+          } else {
+            privatePensionRows += `<td class="px-3 py-2 text-center text-gray-400">-</td>`;
+          }
+        }
+        privatePensionRows += '</tr>';
+      });
+
+      table.innerHTML = `
+        <thead>${headerRow}</thead>
+        <tbody>
+          ${incomeRow}
+          ${npsContribRow}
+          ${npsReceiveRow}
+          ${privatePensionRows}
+        </tbody>
+      `;
+    }
+
+    // ============================================================
+    // @CODE:UI-001 | SPEC: SPEC-UI-001/spec.md
+    // 입력 폼 로직
+    // ============================================================
+
+    /**
+     * 직업 구분 전환 시 입력 필드 토글
+     */
+    function toggleJobType() {
+      const laborerIncome = document.getElementById('laborer-income');
+      const businessIncome = document.getElementById('business-income');
+      const jobType = document.querySelector('input[name="jobType"]:checked')?.value;
+
+      if (jobType === 'laborer') {
+        laborerIncome?.classList.remove('hidden');
+        businessIncome?.classList.add('hidden');
+      } else {
+        laborerIncome?.classList.add('hidden');
+        businessIncome?.classList.remove('hidden');
+      }
+    }
+
+    /**
+     * 폼 데이터 수집
+     * @returns {{jobType: string, currentAge: number, currentIncome: number, isValid: boolean, errors: string[]}}
+     */
+    function getFormData() {
+      const jobType = document.querySelector('input[name="jobType"]:checked')?.value || 'laborer';
+      const currentAge = parseInt(document.getElementById('currentAge')?.value) || 0;
+
+      let currentIncome = 0;
+      if (jobType === 'laborer') {
+        currentIncome = (parseInt(document.getElementById('annualSalary')?.value) || 0) * 10000;
+      } else {
+        currentIncome = (parseInt(document.getElementById('monthlyBusinessIncome')?.value) || 0) * 10000 * 12;
+      }
+
+      const validation = validateFormData({ jobType, currentAge, currentIncome });
+
+      return {
+        jobType,
+        currentAge,
+        currentIncome,
+        isValid: validation.isValid,
+        errors: validation.errors
+      };
+    }
+
+    /**
+     * 폼 데이터 검증
+     * @param {Object} data - 폼 데이터
+     * @returns {{isValid: boolean, errors: string[]}}
+     */
+    function validateFormData(data) {
+      const errors = [];
+
+      if (data.currentAge < 20 || data.currentAge > 59) {
+        errors.push('나이는 20-59세 범위여야 합니다.');
+      }
+
+      if (data.currentIncome <= 0) {
+        errors.push('소득은 양수여야 합니다.');
+      }
+
+      return {
+        isValid: errors.length === 0,
+        errors
+      };
+    }
+
+    /**
+     * 오류 메시지 표시
+     * @param {string[]} errors - 오류 메시지 배열
+     */
+    function showErrors(errors) {
+      const errorContainer = document.getElementById('error-message');
+      if (errorContainer) {
+        errorContainer.classList.remove('hidden');
+        errorContainer.querySelector('p').textContent = errors.join(' ');
+      }
+    }
+
+    /**
+     * 오류 메시지 숨김
+     */
+    function hideErrors() {
+      const errorContainer = document.getElementById('error-message');
+      if (errorContainer) {
+        errorContainer.classList.add('hidden');
+      }
+    }
+
+    /**
+     * 계산 버튼 클릭 핸들러
+     */
+    function handleCalculate() {
+      hideErrors();
+
+      const formData = getFormData();
+
+      if (!formData.isValid) {
+        showErrors(formData.errors);
+        return;
+      }
+
+      executeCalculation(formData);
+    }
+
+    /**
+     * 계산 실행 및 결과 표시
+     * @param {Object} data - 검증된 폼 데이터
+     */
+    function executeCalculation(data) {
+      // 임금 곡선 계산
+      const incomes = calculateWageCurve(data.currentAge, data.currentIncome);
+
+      // 국민연금 계산
+      const npsResult = calculateNPS(incomes, data.jobType);
+      const npsTax = calculateNPSTax(npsResult.monthlyBenefit);
+
+      // 개인연금 계산 (전체 상품)
+      const privatePensionResults = calculatePrivatePension(incomes);
+      const privatePensionWithTax = privatePensionResults.map(result => ({
+        ...result,
+        tax: calculatePrivatePensionTax(result.monthlyBenefit, 60)
+      }));
+
+      // 결과 저장 (UI-002에서 사용)
+      window.calculationResult = {
+        formData: data,
+        incomes,
+        nps: { ...npsResult, tax: npsTax },
+        privatePensions: privatePensionWithTax
+      };
+
+      // 결과 테이블 표시 (UI-002 함수 호출)
+      if (typeof renderResultTable === 'function') {
+        renderResultTable(window.calculationResult);
+      }
+
+      // 결과 컨테이너 표시
+      const resultContainer = document.getElementById('result-container');
+      if (resultContainer) {
+        resultContainer.classList.remove('hidden');
+      }
+
+      console.log('계산 완료:', window.calculationResult);
+    }
+
+    // ============================================================
+    // @CODE:TAX-001 | SPEC: SPEC-TAX-001/spec.md
+    // 세금 계산 로직
+    // ============================================================
+
+    /** 국민연금 세금 상수 */
+    const NPS_TAX_CONSTANTS = {
+      ANNUAL_EXEMPTION: 3500000,  // 연간 비과세 한도 (350만원)
+      TAX_RATE: 0.05             // 간소화 세율 5%
+    };
+
+    /** 개인연금 세율 (연령별) */
+    const PRIVATE_PENSION_TAX_RATES = {
+      UNDER_70: 0.055,  // 70세 미만: 5.5%
+      UNDER_80: 0.044,  // 70~79세: 4.4%
+      OVER_80: 0.033    // 80세 이상: 3.3%
+    };
+
+    /**
+     * 국민연금 세금 계산 (간이세액표 간소화)
+     * @param {number} monthlyBenefit - 월 수령액
+     * @returns {{grossAmount: number, taxAmount: number, netAmount: number}}
+     */
+    function calculateNPSTax(monthlyBenefit) {
+      if (!monthlyBenefit || monthlyBenefit <= 0) {
+        return { grossAmount: 0, taxAmount: 0, netAmount: 0 };
+      }
+
+      const annualBenefit = monthlyBenefit * 12;
+      const taxableAmount = Math.max(0, annualBenefit - NPS_TAX_CONSTANTS.ANNUAL_EXEMPTION);
+      const annualTax = taxableAmount * NPS_TAX_CONSTANTS.TAX_RATE;
+      const monthlyTax = Math.round(annualTax / 12);
+
+      return {
+        grossAmount: monthlyBenefit,
+        taxAmount: monthlyTax,
+        netAmount: monthlyBenefit - monthlyTax
+      };
+    }
+
+    /**
+     * 연령별 개인연금 세율 조회
+     * @param {number} age - 수령 시 연령
+     * @returns {number} 세율
+     */
+    function getPrivatePensionTaxRate(age) {
+      if (age >= 80) return PRIVATE_PENSION_TAX_RATES.OVER_80;
+      if (age >= 70) return PRIVATE_PENSION_TAX_RATES.UNDER_80;
+      return PRIVATE_PENSION_TAX_RATES.UNDER_70;
+    }
+
+    /**
+     * 개인연금 세금 계산
+     * @param {number} monthlyBenefit - 월 수령액
+     * @param {number} age - 수령 시 연령 (기본값: 60)
+     * @returns {{grossAmount: number, taxAmount: number, netAmount: number, taxRate: number}}
+     */
+    function calculatePrivatePensionTax(monthlyBenefit, age = 60) {
+      if (!monthlyBenefit || monthlyBenefit <= 0) {
+        return { grossAmount: 0, taxAmount: 0, netAmount: 0, taxRate: 0 };
+      }
+
+      const taxRate = getPrivatePensionTaxRate(age);
+      const taxAmount = Math.round(monthlyBenefit * taxRate);
+
+      return {
+        grossAmount: monthlyBenefit,
+        taxAmount,
+        netAmount: monthlyBenefit - taxAmount,
+        taxRate
+      };
+    }
+
+    // ============================================================
     // @TEST:DATA-001 | SPEC: SPEC-DATA-001/spec.md
     // 테스트 케이스 정의 (RED Phase)
     // ============================================================
@@ -592,6 +1034,134 @@
             const results = calculatePrivatePension(incomes);
             return results.every(r => r.totalBalance > r.totalContribution);
           }
+        },
+
+        // ============================================================
+        // @TEST:TAX-001 | SPEC: SPEC-TAX-001/spec.md
+        // ============================================================
+        {
+          name: 'calculateNPSTax 함수 존재',
+          test: () => typeof calculateNPSTax === 'function'
+        },
+        {
+          name: 'calculatePrivatePensionTax 함수 존재',
+          test: () => typeof calculatePrivatePensionTax === 'function'
+        },
+        {
+          name: '국민연금 0원 → 세금 0',
+          test: () => calculateNPSTax(0).taxAmount === 0
+        },
+        {
+          name: '국민연금 월 20만원 (연 240만원) → 비과세',
+          test: () => calculateNPSTax(200000).taxAmount === 0
+        },
+        {
+          name: '국민연금 월 100만원 → 세금 발생',
+          test: () => {
+            const result = calculateNPSTax(1000000);
+            // 연 1200만원 - 350만원 = 850만원 × 5% = 42.5만원/년 ≈ 35,417원/월
+            return result.taxAmount > 0 && result.netAmount < result.grossAmount;
+          }
+        },
+        {
+          name: '국민연금 세후 = 세전 - 세금',
+          test: () => {
+            const result = calculateNPSTax(1000000);
+            return result.netAmount === result.grossAmount - result.taxAmount;
+          }
+        },
+        {
+          name: '개인연금 0원 → 세금 0',
+          test: () => calculatePrivatePensionTax(0).taxAmount === 0
+        },
+        {
+          name: '개인연금 60세 → 5.5% 세율',
+          test: () => calculatePrivatePensionTax(1000000, 60).taxRate === 0.055
+        },
+        {
+          name: '개인연금 75세 → 4.4% 세율',
+          test: () => calculatePrivatePensionTax(1000000, 75).taxRate === 0.044
+        },
+        {
+          name: '개인연금 85세 → 3.3% 세율',
+          test: () => calculatePrivatePensionTax(1000000, 85).taxRate === 0.033
+        },
+        {
+          name: '개인연금 월 100만원, 60세 → 세금 55,000원',
+          test: () => calculatePrivatePensionTax(1000000, 60).taxAmount === 55000
+        },
+
+        // ============================================================
+        // @TEST:UI-001 | SPEC: SPEC-UI-001/spec.md
+        // ============================================================
+        {
+          name: 'getFormData 함수 존재',
+          test: () => typeof getFormData === 'function'
+        },
+        {
+          name: 'validateFormData 함수 존재',
+          test: () => typeof validateFormData === 'function'
+        },
+        {
+          name: 'executeCalculation 함수 존재',
+          test: () => typeof executeCalculation === 'function'
+        },
+        {
+          name: 'toggleJobType 함수 존재',
+          test: () => typeof toggleJobType === 'function'
+        },
+        {
+          name: '유효한 데이터 검증 통과',
+          test: () => {
+            const result = validateFormData({ currentAge: 30, currentIncome: 50000000 });
+            return result.isValid === true && result.errors.length === 0;
+          }
+        },
+        {
+          name: '잘못된 나이 검증 실패',
+          test: () => {
+            const result = validateFormData({ currentAge: 15, currentIncome: 50000000 });
+            return result.isValid === false && result.errors.length > 0;
+          }
+        },
+        {
+          name: '잘못된 소득 검증 실패',
+          test: () => {
+            const result = validateFormData({ currentAge: 30, currentIncome: -1000 });
+            return result.isValid === false && result.errors.length > 0;
+          }
+        },
+
+        // ============================================================
+        // @TEST:UI-002 | SPEC: SPEC-UI-002/spec.md
+        // ============================================================
+        {
+          name: 'formatCurrency 함수 존재',
+          test: () => typeof formatCurrency === 'function'
+        },
+        {
+          name: 'renderResultTable 함수 존재',
+          test: () => typeof renderResultTable === 'function'
+        },
+        {
+          name: 'renderSummaryCards 함수 존재',
+          test: () => typeof renderSummaryCards === 'function'
+        },
+        {
+          name: 'formatCurrency 0원 → "-"',
+          test: () => formatCurrency(0) === '-'
+        },
+        {
+          name: 'formatCurrency 5000만원 포맷',
+          test: () => formatCurrency(50000000) === '5,000만원'
+        },
+        {
+          name: 'formatCurrency 원 단위 포맷',
+          test: () => formatCurrency(1234567, '원') === '1,234,567원'
+        },
+        {
+          name: 'formatCurrency null → "-"',
+          test: () => formatCurrency(null) === '-'
         }
       ];
 
