@@ -21,9 +21,11 @@
     </div>
 
     <!-- @CODE:UI-001 | SPEC: SPEC-UI-001/spec.md -->
-    <!-- 계산기 폼 (데이터 로드 후 활성화) -->
-    <div id="calculator-form" class="hidden max-w-md mx-auto">
-      <div class="bg-white rounded-lg shadow-md p-6">
+    <!-- 입력폼 + 데이터 출처 컨테이너 -->
+    <div class="max-w-4xl mx-auto flex flex-col lg:flex-row gap-6">
+      <!-- 계산기 폼 (데이터 로드 후 활성화) -->
+      <div id="calculator-form" class="hidden flex-1 lg:max-w-md">
+        <div class="bg-white rounded-lg shadow-md p-6">
         <!-- 직업 구분 -->
         <div class="mb-4">
           <label class="block text-sm font-medium text-gray-700 mb-2">직업 구분</label>
@@ -83,10 +85,73 @@
         </div>
 
         <!-- 계산하기 버튼 -->
-        <button onclick="handleCalculate()"
-                class="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 transition-colors font-medium">
-          계산하기
+        <button id="calculate-btn" onclick="handleCalculate()"
+                class="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2">
+          <span id="btn-text">계산하기</span>
+          <svg id="btn-spinner" class="hidden animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
         </button>
+        </div>
+      </div>
+
+      <!-- 데이터 출처 (우측) -->
+      <div class="flex-1 lg:max-w-sm">
+        <div class="bg-white rounded-lg shadow-md p-4 h-full">
+          <h3 class="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-4">
+            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            데이터 출처
+          </h3>
+          <div class="space-y-3 text-sm text-gray-600">
+            <div class="flex items-start gap-2">
+              <span class="text-blue-500 mt-0.5">•</span>
+              <div>
+                <span class="font-medium text-gray-700">소비자물가 상승률: 과거 20년 평균인 2.5% 적용</span>
+                <p class="text-xs text-gray-500 mt-0.5"><a href="https://snapshot.bok.or.kr/dashboard/C6" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">한국은행</a></p>
+              </div>
+            </div>
+            <div class="flex items-start gap-2">
+              <span class="text-blue-500 mt-0.5">•</span>
+              <div>
+                <span class="font-medium text-gray-700">개인연금 수익률: 과거 실적 + 미래 예상(7.72%)</span>
+                <p class="text-xs text-gray-500 mt-0.5">처음 3~10년: 각 펀드의 실제 수익률 (3/5/7/10년 데이터)</p>
+                <p class="text-xs text-gray-500 mt-0.5">이후 기간: 상위 500개 펀드 평균 7.72% 적용</p>
+                <p class="text-xs text-gray-500 mt-0.5"><a href="https://www.fss.or.kr/fss/lifeplan/goodsCmpr/list.do?menuNo=200961" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">금융감독원 연금저축 비교공시</a></p>
+              </div>
+            </div>
+            <div class="flex items-start gap-2">
+              <span class="text-blue-500 mt-0.5">•</span>
+              <div>
+                <span class="font-medium text-gray-700">평균 취업 연령: 30세</span>
+                <p class="text-xs text-gray-500 mt-0.5"><a href="https://news.incruit.com/news/newsview.asp?newsno=437372" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">인크루트 2025 설문</a><p></p>
+              </div>
+            </div>
+            <div class="flex items-start gap-2">
+              <span class="text-blue-500 mt-0.5">•</span>
+              <div>
+                <span class="font-medium text-gray-700">신입사원 초임 평균(2023년 조사): 3,800만원</span>
+                <p class="text-xs text-gray-500 mt-0.5"><a href="https://kosis.kr/statHtml/statHtml.do?tblId=DT_14217M_241&orgId=115" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">KOSIS 2023</a></p>
+              </div>
+            </div>
+            <div class="flex items-start gap-2">
+              <span class="text-blue-500 mt-0.5">•</span>
+              <div>
+                <span class="font-medium text-gray-700">기대수명: 65세 도달 연도의 기대수명으로 자동 계산 </span>
+                <p class="text-xs text-gray-500 mt-0.5"><a href="https://kosis.kr/statHtml/statHtml.do?orgId=101&tblId=DT_1BPA003" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">KOSIS 장래인구추계</a></p>
+              </div>
+            </div>
+            <div class="flex items-start gap-2">
+              <span class="text-blue-500 mt-0.5">•</span>
+              <div>
+                <span class="font-medium text-gray-700">국민연금 개정안: 보험료율 9%→13%, 소득대체율 43%</span>
+                <p class="text-xs text-gray-500 mt-0.5"><a href="https://www.nps.or.kr" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">국민연금공단</a></p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -95,17 +160,45 @@
     <div id="result-container" class="hidden mt-8">
       <!-- 요약 카드 -->
       <div id="summary-cards" class="mb-8">
-        <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">60세 기준 월 예상 수령액 (세후)</h2>
+        <h2 id="summary-title" class="text-xl font-bold text-gray-800 mb-2 text-center">예상 총 수령액 비교</h2>
+        <p id="life-expectancy-info" class="text-sm text-gray-500 text-center mb-4"></p>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="summary-grid">
           <!-- JavaScript로 동적 생성 -->
         </div>
       </div>
 
-      <!-- 연도별 상세 테이블 -->
-      <div class="bg-white rounded-lg shadow-md p-4">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4">연도별 상세 내역</h3>
+      <!-- 연도별 납입 상세 테이블 -->
+      <div class="bg-white rounded-lg shadow-md p-4 mb-8">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">납입 기간 상세 내역</h3>
         <div class="overflow-x-auto">
           <table id="result-table" class="min-w-full text-sm">
+            <!-- JavaScript로 동적 생성 -->
+          </table>
+        </div>
+      </div>
+
+      <!-- 수령 기간 수령액 테이블 -->
+      <div class="bg-white rounded-lg shadow-md p-4">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
+          <h3 class="text-lg font-semibold text-gray-800" id="receiving-table-title">65~85세 연간 수령액 비교</h3>
+          <div class="relative">
+            <input
+              type="text"
+              id="pension-search"
+              placeholder="연금 상품 검색..."
+              class="w-full sm:w-64 px-3 py-2 pl-9 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+            />
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
+        </div>
+        <p class="text-sm text-gray-500 mb-4">
+          * 국민연금: 물가연동 (매년 <span id="inflation-rate-display">2.5%</span> 인상)
+          | 개인연금: 고정 수령액
+        </p>
+        <div class="overflow-x-auto">
+          <table id="receiving-table" class="min-w-full text-sm">
             <!-- JavaScript로 동적 생성 -->
           </table>
         </div>
@@ -133,9 +226,21 @@
       updated_at: "2025-01-01",
       nps: {
         a_value: 2989352,
-        replacement_rate: 0.40,
+        replacement_rate: 0.43,  // 2026년 개정: 40% → 43%
         max_monthly_income: 5900000,
-        min_monthly_income: 370000
+        min_monthly_income: 370000,
+        // 2026년 개정: 보험료율 연도별 인상 (9% → 13%)
+        contribution_rates: {
+          2025: 0.09,
+          2026: 0.095,
+          2027: 0.10,
+          2028: 0.105,
+          2029: 0.11,
+          2030: 0.115,
+          2031: 0.12,
+          2032: 0.125,
+          2033: 0.13
+        }
       },
       market: {
         sp500_10yr_avg: 0.08,
@@ -148,8 +253,272 @@
         "40s": 0.03,
         "50s_early": 0.00,
         "50s_late": -0.02
+      },
+      employment: {
+        average_start_age: 30,
+        average_start_income: 30000000
+      },
+      receiving: {
+        start_age: 65,
+        end_age: 85,
+        years: 20
       }
     };
+
+    /** 연금저축펀드 상품 (CSV에서 로드) */
+    let BANK_PENSION_PRODUCTS = [];
+
+    /** 물가상승률 (CSV에서 계산) */
+    let INFLATION_RATE = 0.025;
+
+    /** 기대수명 데이터 (연도별) */
+    let LIFE_EXPECTANCY_DATA = {};
+
+    /** 전체 개인연금 상품 (기존 + 펀드 상품) */
+    let ALL_PENSION_PRODUCTS = [];
+
+    /**
+     * 미래 예상 수익률 (상위 500개 펀드 평균)
+     * 과거 데이터가 없는 기간에 적용
+     */
+    const FUTURE_RETURN_RATE = 0.0772;
+
+    /**
+     * 연금저축펀드 CSV 파일 로드 및 파싱
+     * @returns {Promise<Array>} 파싱된 상품 배열
+     */
+    async function loadPensionProducts() {
+      try {
+        const response = await fetch('./data/100lifeplan_fund.csv');
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        const text = await response.text();
+        return parseCSV(text);
+      } catch (error) {
+        console.warn('연금저축펀드 CSV 로드 실패:', error.message);
+        return [];
+      }
+    }
+
+    /**
+     * CSV 텍스트를 파싱하여 상품 배열 반환
+     * 쉼표가 포함된 숫자를 처리하기 위해 따옴표 내 쉼표를 무시
+     * @param {string} text - CSV 텍스트
+     * @returns {Array} 파싱된 상품 배열
+     */
+    function parseCSV(text) {
+      const lines = text.split('\n');
+      const products = [];
+
+      // CSV 라인을 파싱 (따옴표 내 쉼표 처리)
+      function parseCSVLine(line) {
+        const result = [];
+        let current = '';
+        let inQuotes = false;
+
+        for (let i = 0; i < line.length; i++) {
+          const char = line[i];
+          if (char === '"') {
+            inQuotes = !inQuotes;
+          } else if (char === ',' && !inQuotes) {
+            result.push(current.trim());
+            current = '';
+          } else {
+            current += char;
+          }
+        }
+        result.push(current.trim());
+        return result;
+      }
+
+      // Row 9(인덱스 8)부터 데이터 시작
+      for (let i = 8; i < lines.length; i++) {
+        const cols = parseCSVLine(lines[i]);
+        if (!cols[0]?.trim()) continue;
+
+        // 컬럼 구조 (100lifeplan_fund.csv - 펀드):
+        // 0: 상품명, 1: 금융회사, 2: 상품유형, 3: 최초판매일, 4: 판매여부, 5: 중도해지
+        // 6: 납입원금(25년), 7: 적립금(25년), 8: 수익률(25년), 9: 수정기준가수익률(25년)
+        // 10: 납입원금(24년), 11: 적립금(24년), 12: 수익률(24년), 13: 수정기준가수익률(24년)
+        // 14: 3년수익률, 15: 5년수익률, 16: 7년수익률, 17: 10년수익률
+        // 18: 3년수수료, 19: 5년수수료, 20: 7년수수료, 21: 10년수수료
+
+        const name = cols[0].trim();
+        const bank = cols[1]?.trim() || '';
+        const type = cols[2]?.trim() || '';
+
+        // 10년 수익률 우선, 없으면 7년, 5년, 3년 순으로 사용
+        // returnYears: 해당 수익률의 측정 기간 (과거 데이터 기간)
+        let returnRate = 0;
+        let returnYears = 0;
+        
+        if (parseFloat(cols[17]) > 0) {
+          returnRate = parseFloat(cols[17]);
+          returnYears = 10;
+        } else if (parseFloat(cols[16]) > 0) {
+          returnRate = parseFloat(cols[16]);
+          returnYears = 7;
+        } else if (parseFloat(cols[15]) > 0) {
+          returnRate = parseFloat(cols[15]);
+          returnYears = 5;
+        } else if (parseFloat(cols[14]) > 0) {
+          returnRate = parseFloat(cols[14]);
+          returnYears = 3;
+        }
+
+        // 10년 수수료 우선, 없으면 7년, 5년, 3년 순으로 사용
+        let feeRate = parseFloat(cols[21]) || 0;
+        if (feeRate === 0) feeRate = parseFloat(cols[20]) || 0;
+        if (feeRate === 0) feeRate = parseFloat(cols[19]) || 0;
+        if (feeRate === 0) feeRate = parseFloat(cols[18]) || 0;
+
+        // 수익률이 0이거나 비정상적으로 높은 경우 제외 (연 수익률 30% 초과는 비정상)
+        if (returnRate === 0 || returnRate > 30 || returnRate < -30) continue;
+
+        // CSV 데이터의 실제 수익률 사용 (10년/7년/5년/3년 장기 수익률)
+        // returnYears: 과거 데이터 기간 (이 기간은 실제 수익률 적용)
+        // futureReturn: 미래 예상 수익률 (상위 500개 펀드 평균)
+        products.push({
+          id: `fund_${i - 8}`,
+          name: `${name}`,
+          bank: bank,
+          type: type,
+          return: returnRate / 100,  // 과거 실제 수익률 (%를 소수로 변환)
+          returnYears: returnYears,  // 과거 데이터 기간 (년)
+          futureReturn: FUTURE_RETURN_RATE,  // 미래 예상 수익률
+          fee: feeRate / 100
+        });
+      }
+
+      console.log(`연금저축펀드 ${products.length}개 상품 로드 완료`);
+      return products;
+    }
+
+    /**
+     * 물가상승률 CSV 로드 및 평균 계산
+     * @returns {Promise<number>} 평균 물가상승률
+     */
+    async function loadInflationData() {
+      try {
+        const response = await fetch('./data/consumer-price-inflation.csv');
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        const text = await response.text();
+        return calculateAverageInflation(text);
+      } catch (error) {
+        console.warn('물가상승률 CSV 로드 실패:', error.message);
+        return DEFAULT_DATA.market.inflation_rate;
+      }
+    }
+
+    /**
+     * 물가상승률 CSV에서 평균 계산 (최근 20년)
+     * @param {string} csvText - CSV 텍스트
+     * @returns {number} 평균 물가상승률 (소수)
+     */
+    function calculateAverageInflation(csvText) {
+      const lines = csvText.split('\n');
+      let total = 0;
+      let count = 0;
+
+      // Row 8(인덱스 7)부터 데이터 시작
+      // 최근 20년 데이터만 사용 (약 240개월)
+      const startIndex = Math.max(7, lines.length - 240);
+
+      for (let i = startIndex; i < lines.length; i++) {
+        const cols = lines[i].split(',');
+        const rate = parseFloat(cols[2]); // 전년동월대비 (%)
+        if (!isNaN(rate)) {
+          total += rate;
+          count++;
+        }
+      }
+
+      const avgRate = count > 0 ? (total / count) / 100 : 0.025;
+      console.log(`물가상승률 평균: ${(avgRate * 100).toFixed(2)}% (${count}개월 데이터)`);
+      return avgRate;
+    }
+
+    /**
+     * 기대수명 CSV 파일 로드 및 파싱
+     * @returns {Promise<Object>} 연도별 기대수명 데이터
+     */
+    async function loadLifeExpectancyData() {
+      try {
+        const response = await fetch('./data/장래_기대수명.csv');
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        const text = await response.text();
+        return parseLifeExpectancyCSV(text);
+      } catch (error) {
+        console.warn('기대수명 CSV 로드 실패:', error.message);
+        return { 2025: 84.5 }; // 기본값
+      }
+    }
+
+    /**
+     * 기대수명 CSV 파싱
+     * @param {string} csvText - CSV 텍스트
+     * @returns {Object} { 연도: 기대수명 }
+     */
+    function parseLifeExpectancyCSV(csvText) {
+      const lines = csvText.split('\n');
+      const data = {};
+
+      // 첫 번째 줄은 헤더, 두 번째 줄부터 데이터
+      for (let i = 1; i < lines.length; i++) {
+        const cols = lines[i].split(',');
+        if (cols.length < 3) continue;
+
+        const assumption = cols[0].replace(/"/g, '').trim();
+        const year = parseInt(cols[1].replace(/"/g, '').trim());
+        const lifeExpectancy = parseFloat(cols[2]);
+
+        // 중위 가정만 사용
+        if (assumption === '중위' && !isNaN(year) && !isNaN(lifeExpectancy)) {
+          data[year] = lifeExpectancy;
+        }
+      }
+
+      console.log(`기대수명 데이터 로드: ${Object.keys(data).length}개 연도`);
+      return data;
+    }
+
+    /**
+     * 특정 나이의 사용자가 65세가 되는 해의 기대수명 계산
+     * @param {number} currentAge - 현재 나이
+     * @returns {number} 기대수명 (반올림)
+     */
+    function getExpectedLifespan(currentAge) {
+      const currentYear = new Date().getFullYear();
+      const startAge = APP_DATA?.receiving?.start_age ?? DEFAULT_DATA.receiving.start_age;
+      const yearsToRetirement = startAge - currentAge;
+      const retirementYear = currentYear + yearsToRetirement;
+
+      // 해당 연도의 기대수명 찾기
+      let lifeExpectancy = LIFE_EXPECTANCY_DATA[retirementYear];
+
+      // 없으면 가장 가까운 연도 사용
+      if (!lifeExpectancy) {
+        const years = Object.keys(LIFE_EXPECTANCY_DATA).map(Number).sort((a, b) => a - b);
+        if (retirementYear < years[0]) {
+          lifeExpectancy = LIFE_EXPECTANCY_DATA[years[0]];
+        } else if (retirementYear > years[years.length - 1]) {
+          lifeExpectancy = LIFE_EXPECTANCY_DATA[years[years.length - 1]];
+        } else {
+          // 가장 가까운 연도 찾기
+          const closest = years.reduce((prev, curr) =>
+            Math.abs(curr - retirementYear) < Math.abs(prev - retirementYear) ? curr : prev
+          );
+          lifeExpectancy = LIFE_EXPECTANCY_DATA[closest];
+        }
+      }
+
+      return Math.round(lifeExpectancy || 85);
+    }
 
     /**
      * data.json을 비동기로 로드하고 전역 변수에 저장
@@ -185,6 +554,40 @@
     }
 
     /**
+     * 모든 데이터 로드 (JSON + CSV)
+     * @returns {Promise<void>}
+     */
+    async function loadAllData() {
+      try {
+        // 병렬 로드
+        const [_, bankProducts, inflationRate, lifeExpectancy] = await Promise.all([
+          loadData(),
+          loadPensionProducts(),
+          loadInflationData(),
+          loadLifeExpectancyData()
+        ]);
+
+        // 전역 변수 설정
+        BANK_PENSION_PRODUCTS = bankProducts || [];
+        INFLATION_RATE = inflationRate || 0.025;
+        LIFE_EXPECTANCY_DATA = lifeExpectancy || { 2025: 84.5 };
+
+        // 전체 상품 목록 생성 (기존 3개 + 펀드 상품)
+        ALL_PENSION_PRODUCTS = [...PRIVATE_PENSION_PRODUCTS, ...BANK_PENSION_PRODUCTS];
+
+        console.log(`전체 개인연금 상품: ${ALL_PENSION_PRODUCTS.length}개`);
+        console.log(`기대수명 데이터: ${Object.keys(LIFE_EXPECTANCY_DATA).length}개 연도`);
+      } catch (error) {
+        console.error('loadAllData 오류:', error);
+        // 기본값 설정
+        BANK_PENSION_PRODUCTS = [];
+        INFLATION_RATE = 0.025;
+        LIFE_EXPECTANCY_DATA = { 2025: 84.5 };
+        ALL_PENSION_PRODUCTS = [...PRIVATE_PENSION_PRODUCTS];
+      }
+    }
+
+    /**
      * 데이터 필드 검증 및 기본값 병합
      * @param {Object} data - 로드된 JSON 데이터
      * @returns {Object} 검증 및 기본값 병합된 데이터
@@ -194,7 +597,9 @@
         updated_at: data.updated_at || DEFAULT_DATA.updated_at,
         nps: { ...DEFAULT_DATA.nps, ...(data.nps || {}) },
         market: { ...DEFAULT_DATA.market, ...(data.market || {}) },
-        wage_curve: { ...DEFAULT_DATA.wage_curve, ...(data.wage_curve || {}) }
+        wage_curve: { ...DEFAULT_DATA.wage_curve, ...(data.wage_curve || {}) },
+        employment: { ...DEFAULT_DATA.employment, ...(data.employment || {}) },
+        receiving: { ...DEFAULT_DATA.receiving, ...(data.receiving || {}) }
       };
     }
 
@@ -239,9 +644,63 @@
      * 페이지 초기화
      */
     document.addEventListener('DOMContentLoaded', async () => {
-      await loadData();
-      enableCalculation();
+      try {
+        await loadAllData();
+        enableCalculation();
+        setupPensionSearch();
+      } catch (error) {
+        console.error('데이터 로드 오류:', error);
+        const loadingStatus = document.getElementById('loading-status');
+        if (loadingStatus) {
+          loadingStatus.innerHTML = `
+            <span class="text-red-600">
+              데이터 로드 실패: ${error.message}
+            </span>
+          `;
+        }
+        // 기본값으로라도 계산 폼 활성화
+        APP_DATA = { ...DEFAULT_DATA };
+        document.getElementById('calculator-form')?.classList.remove('hidden');
+        setupPensionSearch();
+      }
     });
+
+    /**
+     * 연금 검색 기능 설정
+     */
+    function setupPensionSearch() {
+      const searchInput = document.getElementById('pension-search');
+      if (!searchInput) return;
+
+      // 디바운스 타이머
+      let debounceTimer = null;
+
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value;
+
+        // 검색어가 비어있으면 즉시 전체 표시
+        if (query.trim() === '') {
+          clearTimeout(debounceTimer);
+          renderReceivingTable(null, '');
+          return;
+        }
+
+        // 디바운스: 300ms 대기 후 검색 실행
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          renderReceivingTable(null, query);
+        }, 300);
+      });
+
+      // Enter 키로 즉시 검색
+      searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          clearTimeout(debounceTimer);
+          const query = e.target.value;
+          renderReceivingTable(null, query);
+        }
+      });
+    }
 
     // ============================================================
     // @CODE:CALC-001 | SPEC: SPEC-CALC-001/spec.md
@@ -263,6 +722,8 @@
 
     /**
      * 연령별 예상 소득 계산 (임금 상승 곡선)
+     * - 30세 미만: 입력한 나이부터 60세까지 계산
+     * - 30세 이상: 30세부터 과거 소득 역산 후 60세까지 계산
      * @param {number} currentAge - 현재 나이 (20-59)
      * @param {number} currentIncome - 현재 연소득 (원)
      * @returns {Array<{age: number, year: number, income: number}>} 연도별 소득 배열
@@ -278,20 +739,45 @@
         return [];
       }
 
-      const result = [];
+      const START_AGE = APP_DATA?.employment?.average_start_age ?? DEFAULT_DATA.employment.average_start_age;
       const currentYear = new Date().getFullYear();
-      let income = currentIncome;
+      const result = [];
 
-      // 현재 나이부터 60세까지 계산
-      for (let age = currentAge; age <= 60; age++) {
-        const year = currentYear + (age - currentAge);
+      // 30세 미만인 경우: 입력한 나이부터 60세까지 계산
+      if (currentAge < START_AGE) {
+        let income = currentIncome;
+        for (let age = currentAge; age <= 60; age++) {
+          const year = currentYear + (age - currentAge);
+          result.push({
+            age,
+            year,
+            income: Math.round(income)
+          });
+          if (age < 60) {
+            const growthRate = getWageGrowthRate(age);
+            income = income * (1 + growthRate);
+          }
+        }
+        return result;
+      }
+
+      // 30세 이상인 경우: 30세부터 과거 소득 역산 후 미래 예측
+      // 현재 소득에서 30세 소득 역산
+      let income30 = currentIncome;
+      for (let age = currentAge - 1; age >= START_AGE; age--) {
+        const growthRate = getWageGrowthRate(age);
+        income30 = income30 / (1 + growthRate);
+      }
+
+      // 30세부터 60세까지 순차 계산
+      let income = income30;
+      for (let age = START_AGE; age <= 60; age++) {
+        const year = currentYear - (currentAge - age);
         result.push({
           age,
           year,
           income: Math.round(income)
         });
-
-        // 60세 이전까지만 상승률 적용
         if (age < 60) {
           const growthRate = getWageGrowthRate(age);
           income = income * (1 + growthRate);
@@ -308,11 +794,24 @@
 
     /** 국민연금 상수 */
     const NPS_CONSTANTS = {
-      EMPLOYEE_RATE: 0.045,      // 근로자 본인 부담률
-      EMPLOYER_RATE: 0.045,      // 회사 부담률
-      SELF_EMPLOYED_RATE: 0.09,  // 사업자 부담률
       FULL_MONTHS: 480           // 40년 = 480개월 (만액 기준)
     };
+
+    /**
+     * 연도별 국민연금 보험료율 반환 (2026년 개정 반영)
+     * - 2025년 이전: 9%
+     * - 2026년: 9.5%
+     * - 매년 0.5%씩 인상
+     * - 2033년 이후: 13%
+     * @param {number} year - 연도
+     * @returns {number} 보험료율 (예: 0.09, 0.095, ...)
+     */
+    function getContributionRate(year) {
+      const rates = APP_DATA?.nps?.contribution_rates ?? DEFAULT_DATA.nps.contribution_rates;
+      if (year <= 2025) return 0.09;
+      if (year >= 2033) return 0.13;
+      return rates[year] ?? 0.09;
+    }
 
     /**
      * 기준소득월액 산정 (상하한 적용)
@@ -328,7 +827,7 @@
 
     /**
      * 국민연금 예상 월 수령액 계산
-     * @param {Array<{age: number, income: number}>} incomes - 연도별 소득 배열
+     * @param {Array<{age: number, income: number, year: number}>} incomes - 연도별 소득 배열
      * @param {string} jobType - 직업 유형 ('laborer' | 'business')
      * @returns {{
      *   monthlyBenefit: number,
@@ -348,7 +847,7 @@
       }
 
       const aValue = APP_DATA?.nps?.a_value ?? 2989352;
-      const replacementRate = APP_DATA?.nps?.replacement_rate ?? 0.40;
+      const replacementRate = APP_DATA?.nps?.replacement_rate ?? 0.43;
 
       // B값 계산: 본인의 기준소득월액 평균
       let totalStandardIncome = 0;
@@ -359,8 +858,10 @@
         const standardMonthly = getStandardMonthlyIncome(item.income);
         totalStandardIncome += standardMonthly * 12;
 
-        // 연간 보험료 계산
-        const annualContribution = standardMonthly * 12 * NPS_CONSTANTS.SELF_EMPLOYED_RATE;
+        // 연도별 보험료율 적용 (2026년 개정 반영)
+        const year = item.year ?? new Date().getFullYear();
+        const contributionRate = getContributionRate(year);
+        const annualContribution = standardMonthly * 12 * contributionRate;
 
         if (jobType === 'laborer') {
           selfContribution += annualContribution / 2;
@@ -391,20 +892,22 @@
     // 개인연금 복리 계산
     // ============================================================
 
-    /** 개인연금 상품 정보 */
+    /** 개인연금 상품 정보 (실제 수익률 기반) */
     const PRIVATE_PENSION_PRODUCTS = [
-      { id: 'sp500', name: 'S&P500 ETF', return: 0.08, fee: 0.0003 },
-      { id: 'tdf2050', name: 'TDF 2050', return: 0.05, fee: 0.005 },
-      { id: 'savings', name: '예금형', return: 0.025, fee: 0 }
+      // returnYears: 과거 실적 기간, futureReturn: 미래 예상 수익률
+      { id: 'sp500', name: 'S&P500 ETF', return: 0.10, returnYears: 10, futureReturn: FUTURE_RETURN_RATE, fee: 0.0003 },
+      { id: 'tdf2050', name: 'TDF 2050', return: 0.05, returnYears: 10, futureReturn: FUTURE_RETURN_RATE, fee: 0.005 },
+      { id: 'savings', name: '예금형', return: 0.025, returnYears: 10, futureReturn: 0.025, fee: 0 }  // 예금형은 미래도 동일
     ];
 
     /**
      * 단일 상품 개인연금 계산
-     * @param {Array<{age: number, income: number}>} incomes - 연도별 소득 배열
+     * @param {Array<{age: number, income: number, year: number}>} incomes - 연도별 소득 배열
      * @param {Object} product - 상품 정보
+     * @param {string} [jobType='laborer'] - 직업 유형
      * @returns {Object} 계산 결과
      */
-    function calculateSinglePrivatePension(incomes, product) {
+    function calculateSinglePrivatePension(incomes, product, jobType = 'laborer') {
       if (!incomes || incomes.length === 0) {
         return {
           productId: product.id,
@@ -415,16 +918,38 @@
         };
       }
 
-      const contributionRate = NPS_CONSTANTS.SELF_EMPLOYED_RATE; // 9%
-      const effectiveReturn = product.return - product.fee;
+      // 과거 수익률 (실적 데이터)
+      const pastReturn = product.return - product.fee;
+      // 미래 수익률 (상위 500개 펀드 평균)
+      const futureReturn = (product.futureReturn ?? FUTURE_RETURN_RATE) - product.fee;
+      // 과거 데이터 기간 (년)
+      const returnYears = product.returnYears ?? 10;
 
       let totalContribution = 0;
       let balance = 0;
+      let pastYearsUsed = 0;  // 과거 수익률 적용 연수
+      let futureYearsUsed = 0;  // 미래 수익률 적용 연수
 
-      for (const item of incomes) {
+      for (let i = 0; i < incomes.length; i++) {
+        const item = incomes[i];
+        // 연도별 보험료율 적용 (2026년 개정 반영)
+        // 개인연금 납입액 = 국민연금 본인 부담분과 동일
+        const year = item.year ?? new Date().getFullYear();
+        const fullContributionRate = getContributionRate(year);
+        // 근로자는 본인 부담분(절반), 사업자는 전액
+        const selfContributionRate = jobType === 'laborer' ? fullContributionRate / 2 : fullContributionRate;
+
         // 기준소득월액 기준 납입 (국민연금과 동일)
         const standardMonthly = getStandardMonthlyIncome(item.income);
-        const annualContribution = standardMonthly * 12 * contributionRate;
+        const annualContribution = standardMonthly * 12 * selfContributionRate;
+
+        // 과거/미래 수익률 구분: 처음 returnYears 년은 과거 수익률, 이후는 미래 수익률
+        const effectiveReturn = i < returnYears ? pastReturn : futureReturn;
+        if (i < returnYears) {
+          pastYearsUsed++;
+        } else {
+          futureYearsUsed++;
+        }
 
         // 복리 계산: 이전 잔액에 수익률 적용 후 당해 납입액 추가
         balance = balance * (1 + effectiveReturn) + annualContribution;
@@ -437,6 +962,12 @@
       return {
         productId: product.id,
         productName: product.name,
+        return: product.return,
+        futureReturn: product.futureReturn ?? FUTURE_RETURN_RATE,
+        returnYears: returnYears,
+        pastYearsUsed: pastYearsUsed,
+        futureYearsUsed: futureYearsUsed,
+        fee: product.fee,
         totalContribution: Math.round(totalContribution),
         totalBalance: Math.round(balance),
         monthlyBenefit
@@ -447,16 +978,82 @@
      * 개인연금 예상 적립액 계산 (여러 상품)
      * @param {Array<{age: number, income: number}>} incomes - 연도별 소득 배열
      * @param {Object} [product] - 특정 상품 (미지정 시 전체)
+     * @param {boolean} [useAllProducts=true] - 전체 상품 사용 여부 (CSV 포함)
+     * @param {string} [jobType='laborer'] - 직업 유형
      * @returns {Array} 상품별 계산 결과
      */
-    function calculatePrivatePension(incomes, product = null) {
+    function calculatePrivatePension(incomes, product = null, useAllProducts = true, jobType = 'laborer') {
       if (product) {
-        return [calculateSinglePrivatePension(incomes, product)];
+        return [calculateSinglePrivatePension(incomes, product, jobType)];
       }
 
-      return PRIVATE_PENSION_PRODUCTS.map(p =>
-        calculateSinglePrivatePension(incomes, p)
-      );
+      // 전체 상품 사용 시 ALL_PENSION_PRODUCTS (기존 3개 + 은행 35개)
+      const products = useAllProducts && ALL_PENSION_PRODUCTS.length > 0
+        ? ALL_PENSION_PRODUCTS
+        : PRIVATE_PENSION_PRODUCTS;
+
+      return products.map(p => calculateSinglePrivatePension(incomes, p, jobType));
+    }
+
+    // ============================================================
+    // @CODE:CALC-004 | SPEC: SPEC-CALC-004/spec.md (신규)
+    // 60-80세 수령액 계산 + 물가 연동
+    // ============================================================
+
+    /**
+     * 국민연금 물가연동 수령액 계산 (60-80세)
+     * 국민연금은 매년 물가상승률만큼 수령액 인상
+     * @param {number} baseMonthlyBenefit - 65세 기준 월 수령액
+     * @param {number} [inflationRate] - 물가상승률 (기본값: CSV에서 로드)
+     * @param {number} [expectedLifespan] - 기대수명 (기본값: 설정값)
+     * @returns {Array<{age: number, monthlyBenefit: number, realValue: number}>}
+     */
+    function calculateNPSWithInflation(baseMonthlyBenefit, inflationRate = INFLATION_RATE, expectedLifespan = null) {
+      const startAge = APP_DATA?.receiving?.start_age ?? DEFAULT_DATA.receiving.start_age;
+      const endAge = expectedLifespan || (APP_DATA?.receiving?.end_age ?? DEFAULT_DATA.receiving.end_age);
+      const years = endAge - startAge;
+      const results = [];
+      let currentBenefit = baseMonthlyBenefit;
+
+      for (let year = 0; year <= years; year++) {
+        results.push({
+          age: startAge + year,
+          monthlyBenefit: Math.round(currentBenefit),
+          realValue: Math.round(currentBenefit) // 국민연금은 물가연동이므로 실질가치 유지
+        });
+        // 매년 물가상승률만큼 인상
+        currentBenefit *= (1 + inflationRate);
+      }
+
+      return results;
+    }
+
+    /**
+     * 개인연금 수령액 계산 (65세~기대수명)
+     * 개인연금은 고정 수령액, 실질가치 하락
+     * @param {number} totalBalance - 총 적립액
+     * @param {number} [inflationRate] - 물가상승률 (기본값: CSV에서 로드)
+     * @param {number} [expectedLifespan] - 기대수명 (기본값: 설정값)
+     * @returns {Array<{age: number, monthlyBenefit: number, realValue: number}>}
+     */
+    function calculatePrivatePensionReceiving(totalBalance, inflationRate = INFLATION_RATE, expectedLifespan = null) {
+      const startAge = APP_DATA?.receiving?.start_age ?? DEFAULT_DATA.receiving.start_age;
+      const endAge = expectedLifespan || (APP_DATA?.receiving?.end_age ?? DEFAULT_DATA.receiving.end_age);
+      const years = endAge - startAge;
+      const fixedMonthly = Math.round(totalBalance / ((years + 1) * 12));
+      const results = [];
+
+      for (let year = 0; year <= years; year++) {
+        // 명목 금액은 고정, 실질 가치는 매년 물가상승률만큼 하락
+        const realValue = fixedMonthly / Math.pow(1 + inflationRate, year);
+        results.push({
+          age: startAge + year,
+          monthlyBenefit: fixedMonthly,
+          realValue: Math.round(realValue)
+        });
+      }
+
+      return results;
     }
 
     // ============================================================
@@ -491,27 +1088,70 @@
       const grid = document.getElementById('summary-grid');
       if (!grid) return;
 
+      const startAge = APP_DATA?.receiving?.start_age ?? DEFAULT_DATA.receiving.start_age;
+      const expectedLifespan = result.expectedLifespan;
+      const receivingYears = expectedLifespan - startAge;
+      const currentYear = new Date().getFullYear();
+      const retirementYear = currentYear + (startAge - result.incomes[0]?.age || 0);
+
+      // 제목 및 기대수명 정보 업데이트
+      const summaryTitle = document.getElementById('summary-title');
+      if (summaryTitle) {
+        summaryTitle.textContent = `65세~${expectedLifespan}세 예상 총 수령액 비교`;
+      }
+
+      const lifeExpectancyInfo = document.getElementById('life-expectancy-info');
+      if (lifeExpectancyInfo) {
+        lifeExpectancyInfo.innerHTML = `📊 ${retirementYear}년(65세) 기준 기대수명 <strong>${expectedLifespan}세</strong> · 수령 기간 <strong>${receivingYears}년</strong>`;
+      }
+
+      // 국민연금 65세 시점 월 수령액 (수령액 테이블과 동일한 데이터 사용)
+      const nps65 = result.nps.receiving.find(r => r.age === startAge);
+      const npsMonthlyAt65 = nps65?.monthlyBenefit || 0;
+      const npsTaxAt65 = calculateNPSTax(npsMonthlyAt65);
+
+      // 국민연금 총 수령액 (65세~기대수명)
+      const npsTotalReceiving = result.nps.receiving.reduce((sum, r) => sum + r.monthlyBenefit * 12, 0);
+
+      // 상위 3개 개인연금 (65세 시점 월 수령액 기준 정렬)
+      const topPensions = result.privatePensions
+        .slice()
+        .map(pp => {
+          const pp65 = pp.receiving.find(r => r.age === startAge);
+          const monthlyAt65 = pp65?.monthlyBenefit || 0;
+          const taxAt65 = calculatePrivatePensionTax(monthlyAt65, startAge);
+          const totalReceiving = pp.receiving.reduce((sum, r) => sum + r.monthlyBenefit * 12, 0);
+          return { ...pp, monthlyAt65, netAmountAt65: taxAt65.netAmount, totalReceiving };
+        })
+        .sort((a, b) => b.netAmountAt65 - a.netAmountAt65)
+        .slice(0, 3);
+
       const cards = [
         {
           title: '국민연금',
-          amount: result.nps.tax.netAmount,
+          amount: npsTaxAt65.netAmount,
+          totalReceiving: npsTotalReceiving,
           color: 'blue',
-          tooltip: `세전: ${formatCurrency(result.nps.monthlyBenefit)}`
+          tooltip: `세전: ${formatCurrency(npsMonthlyAt65)}\n총 수령액: ${formatCurrency(npsTotalReceiving)}`
         },
-        ...result.privatePensions.map((pp, index) => ({
-          title: pp.productName,
-          amount: pp.tax.netAmount,
+        ...topPensions.map((pp, index) => ({
+          title: pp.productName.length > 12 ? pp.productName.substring(0, 12) + '...' : pp.productName,
+          amount: pp.netAmountAt65,
+          totalReceiving: pp.totalReceiving,
           color: index === 0 ? 'green' : index === 1 ? 'purple' : 'gray',
-          tooltip: `세전: ${formatCurrency(pp.monthlyBenefit)}`
+          tooltip: `${pp.productName}\n세전: ${formatCurrency(pp.monthlyAt65)}\n수익률: ${((pp.return || 0) * 100).toFixed(1)}%\n총 수령액: ${formatCurrency(pp.totalReceiving)}`
         }))
       ];
 
       grid.innerHTML = cards.map(card => `
         <div class="bg-${card.color}-50 border border-${card.color}-200 rounded-lg p-4 text-center"
              title="${card.tooltip}">
-          <div class="text-sm text-${card.color}-600 font-medium mb-1">${card.title}</div>
-          <div class="text-2xl font-bold text-${card.color}-800">${formatCurrency(card.amount)}</div>
-          <div class="text-xs text-${card.color}-500 mt-1">세후 월 수령액</div>
+          <div class="text-sm text-${card.color}-600 font-medium mb-2">${card.title}</div>
+          <div class="text-2xl font-bold text-${card.color}-800">${formatCurrency(card.totalReceiving)}</div>
+          <div class="text-xs text-${card.color}-500 mt-1">총 수령액</div>
+          <div class="text-xs text-${card.color}-400 mt-2 pt-2 border-t border-${card.color}-200">
+            월 ${formatCurrency(card.amount)} (65세 기준)
+          </div>
         </div>
       `).join('');
     }
@@ -530,64 +1170,252 @@
       const incomes = result.incomes;
       const jobType = result.formData.jobType;
 
-      // 헤더 행 생성
-      let headerRow = '<tr class="bg-gray-100"><th class="px-3 py-2 text-left font-medium text-gray-700 sticky left-0 bg-gray-100 min-w-[120px]">항목</th>';
+      // 납입금 총액 계산
+      const npsTotalContribution = result.nps.totalContribution;
+      const npsSelfContribution = result.nps.selfContribution;
+      const npsEmployerContribution = result.nps.employerContribution;
+
+      // 개인연금 총 납입액 계산 (국민연금 개인 납입분과 동일, 연도별 보험료율 적용)
+      let privateTotalContribution = 0;
       for (const item of incomes) {
-        headerRow += `<th class="px-3 py-2 text-center font-medium text-gray-700 min-w-[100px]">${item.year}년<br><span class="text-xs text-gray-500">(${item.age}세)</span></th>`;
+        const standardMonthly = getStandardMonthlyIncome(item.income);
+        const yearRate = getContributionRate(item.year);
+        const selfRate = jobType === 'laborer' ? yearRate / 2 : yearRate;
+        privateTotalContribution += standardMonthly * 12 * selfRate;
+      }
+      privateTotalContribution = Math.round(privateTotalContribution);
+
+      // 헤더 행 생성
+      let headerRow = '<tr class="bg-gray-100">';
+      headerRow += '<th class="px-3 py-2 text-left font-medium text-gray-700 sticky left-0 bg-gray-100 min-w-[140px]">항목</th>';
+      headerRow += '<th class="px-3 py-2 text-center font-medium text-gray-700 min-w-[140px]">납입금 총액</th>';
+      for (const item of incomes) {
+        headerRow += `<th class="px-3 py-2 text-center font-medium text-gray-700 min-w-[120px]">${item.year}년<br><span class="text-xs text-gray-500">(${item.age}세)</span></th>`;
       }
       headerRow += '</tr>';
 
       // 예상 소득 행
-      let incomeRow = '<tr class="border-b"><td class="px-3 py-2 font-medium text-gray-700 sticky left-0 bg-white">예상 소득</td>';
+      let incomeRow = '<tr class="border-b">';
+      incomeRow += '<td class="px-3 py-2 font-medium text-gray-700 sticky left-0 bg-white">예상 소득</td>';
+      incomeRow += '<td class="px-3 py-2 text-center text-gray-400">-</td>';
       for (const item of incomes) {
-        incomeRow += `<td class="px-3 py-2 text-center text-gray-600">${formatCurrency(item.income)}</td>`;
+        const monthly = Math.round(item.income / 12);
+        incomeRow += `<td class="px-3 py-2 text-center text-gray-600">${formatCurrency(item.income)}<br><span class="text-xs text-gray-500">(월 ${formatCurrency(monthly)})</span></td>`;
       }
       incomeRow += '</tr>';
 
       // 국민연금 납입액 행
-      let npsContribRow = '<tr class="border-b bg-blue-50"><td class="px-3 py-2 font-medium text-blue-700 sticky left-0 bg-blue-50">국민연금 납입</td>';
+      let npsContribRow = '<tr class="border-b bg-blue-50">';
+      npsContribRow += '<td class="px-3 py-2 font-medium text-blue-700 sticky left-0 bg-blue-50">국민연금 납입</td>';
+      npsContribRow += `<td class="px-3 py-2 text-center bg-blue-100">
+        <span class="font-bold text-blue-800">${formatCurrency(npsTotalContribution)}</span>
+        <br><span class="text-xs text-blue-600">(본인 ${formatCurrency(npsSelfContribution)}${jobType === 'laborer' ? `<br>+회사 ${formatCurrency(npsEmployerContribution)}` : ''})</span>
+      </td>`;
       for (const item of incomes) {
         const standardMonthly = getStandardMonthlyIncome(item.income);
-        const monthlyContrib = standardMonthly * (jobType === 'laborer' ? 0.045 : 0.09);
-        const selfMonthly = jobType === 'laborer' ? monthlyContrib : monthlyContrib;
-        npsContribRow += `<td class="px-3 py-2 text-center text-blue-600">${formatCurrency(selfMonthly * 12)}${jobType === 'laborer' ? '<br><span class="text-xs">(+회사 동일)</span>' : ''}</td>`;
+        // 연도별 보험료율 적용 (2026년 개정 반영)
+        const yearRate = getContributionRate(item.year);
+        const selfRate = jobType === 'laborer' ? yearRate / 2 : yearRate;
+        const selfMonthly = standardMonthly * selfRate;
+        const annualContrib = selfMonthly * 12;
+        const employerMonthly = jobType === 'laborer' ? selfMonthly : 0;
+        const employerAnnual = employerMonthly * 12;
+
+        // 보험료율 표시 (연도별 변동 시 추가 표시)
+        const rateDisplay = yearRate !== 0.09 ? `<br><span class="text-xs text-blue-400">(요율 ${(yearRate * 100).toFixed(1)}%)</span>` : '';
+        let cellContent = `${formatCurrency(annualContrib)}<br><span class="text-xs">(월 ${formatCurrency(selfMonthly)})</span>${rateDisplay}`;
+        if (jobType === 'laborer') {
+          cellContent += `<br><span class="text-xs text-blue-500">(+회사 ${formatCurrency(employerAnnual)})</span>`;
+        }
+        npsContribRow += `<td class="px-3 py-2 text-center text-blue-600">${cellContent}</td>`;
       }
       npsContribRow += '</tr>';
 
-      // 국민연금 수령액 행 (60세에만 표시)
-      let npsReceiveRow = '<tr class="border-b bg-blue-100"><td class="px-3 py-2 font-medium text-blue-800 sticky left-0 bg-blue-100">국민연금 수령</td>';
+      // 개인연금 납입액 행 (국민연금 개인 납입분과 동일)
+      let privateContribRow = '<tr class="border-b bg-green-50">';
+      privateContribRow += '<td class="px-3 py-2 font-medium text-green-700 sticky left-0 bg-green-50">개인연금 납입</td>';
+      privateContribRow += `<td class="px-3 py-2 text-center bg-green-100">
+        <span class="font-bold text-green-800">${formatCurrency(privateTotalContribution)}</span>
+        <br><span class="text-xs text-green-600">(본인 부담)</span>
+      </td>`;
       for (const item of incomes) {
-        if (item.age === 60) {
-          npsReceiveRow += `<td class="px-3 py-2 text-center"><span class="font-bold text-blue-800">${formatCurrency(result.nps.tax.netAmount)}</span><br><span class="text-xs text-blue-600">세전: ${formatCurrency(result.nps.monthlyBenefit)}</span></td>`;
-        } else {
-          npsReceiveRow += '<td class="px-3 py-2 text-center text-gray-400">-</td>';
-        }
+        const standardMonthly = getStandardMonthlyIncome(item.income);
+        // 연도별 보험료율 적용 (2026년 개정 반영)
+        const yearRate = getContributionRate(item.year);
+        const selfRate = jobType === 'laborer' ? yearRate / 2 : yearRate;
+        const monthlyContrib = standardMonthly * selfRate;
+        const annualContrib = monthlyContrib * 12;
+        privateContribRow += `<td class="px-3 py-2 text-center text-green-600">${formatCurrency(annualContrib)}<br><span class="text-xs">(월 ${formatCurrency(monthlyContrib)})</span></td>`;
       }
-      npsReceiveRow += '</tr>';
-
-      // 개인연금 수령액 행들
-      let privatePensionRows = '';
-      const colors = ['green', 'purple', 'gray'];
-      result.privatePensions.forEach((pp, index) => {
-        const color = colors[index];
-        privatePensionRows += `<tr class="border-b bg-${color}-50"><td class="px-3 py-2 font-medium text-${color}-700 sticky left-0 bg-${color}-50">${pp.productName}</td>`;
-        for (const item of incomes) {
-          if (item.age === 60) {
-            privatePensionRows += `<td class="px-3 py-2 text-center"><span class="font-bold text-${color}-800">${formatCurrency(pp.tax.netAmount)}</span><br><span class="text-xs text-${color}-600">세전: ${formatCurrency(pp.monthlyBenefit)}</span></td>`;
-          } else {
-            privatePensionRows += `<td class="px-3 py-2 text-center text-gray-400">-</td>`;
-          }
-        }
-        privatePensionRows += '</tr>';
-      });
+      privateContribRow += '</tr>';
 
       table.innerHTML = `
         <thead>${headerRow}</thead>
         <tbody>
           ${incomeRow}
           ${npsContribRow}
-          ${npsReceiveRow}
-          ${privatePensionRows}
+          ${privateContribRow}
+        </tbody>
+      `;
+    }
+
+    // 마지막 계산 결과 저장 (검색 필터링용)
+    let lastCalculationResult = null;
+
+    /**
+     * 수령액 테이블 렌더링 (전체 상품, 매년 표시)
+     * @param {Object} result - 계산 결과 객체
+     * @param {string} searchQuery - 검색어 (선택적)
+     */
+    function renderReceivingTable(result, searchQuery = '') {
+      const table = document.getElementById('receiving-table');
+      if (!table) return;
+
+      // 결과 저장 (검색 필터링용)
+      if (result) {
+        lastCalculationResult = result;
+      } else if (lastCalculationResult) {
+        result = lastCalculationResult;
+      } else {
+        return;
+      }
+
+      const npsReceiving = result.nps.receiving;
+      const privatePensions = result.privatePensions;
+      const expectedLifespan = result.expectedLifespan;
+
+      // 테이블 제목 업데이트 (기대수명 반영)
+      const titleElement = document.getElementById('receiving-table-title');
+      const startAge = APP_DATA?.receiving?.start_age ?? DEFAULT_DATA.receiving.start_age;
+      const endAge = expectedLifespan || (APP_DATA?.receiving?.end_age ?? DEFAULT_DATA.receiving.end_age);
+      if (titleElement) {
+        titleElement.textContent = `${startAge}~${endAge}세 연간 수령액 비교 (기대수명 ${endAge}세)`;
+      }
+
+      // 전체 상품 표시 (수익률 순 정렬)
+      let allProducts = privatePensions
+        .slice()
+        .sort((a, b) => b.tax.netAmount - a.tax.netAmount);
+
+      // 검색어가 있으면 필터링
+      const hasSearchQuery = searchQuery.trim().length > 0;
+      if (hasSearchQuery) {
+        const query = searchQuery.trim().toLowerCase();
+        allProducts = allProducts.filter(pp =>
+          pp.productName.toLowerCase().includes(query) ||
+          (pp.bank && pp.bank.toLowerCase().includes(query))
+        );
+      }
+
+      // 검색 결과 개수 표시
+      const searchResultInfo = hasSearchQuery
+        ? `<span class="text-sm text-blue-600 ml-2">(검색 결과: ${allProducts.length}개)</span>`
+        : '';
+      if (titleElement) {
+        titleElement.innerHTML = `${startAge}~${endAge}세 연간 수령액 비교 (기대수명 ${endAge}세)${searchResultInfo}`;
+      }
+
+      // 검색 결과 없음 처리
+      if (hasSearchQuery && allProducts.length === 0) {
+        table.innerHTML = `
+          <thead>
+            <tr class="bg-gray-100">
+              <th class="px-2 py-2 text-center font-medium text-gray-700">연령</th>
+              <th class="px-2 py-2 text-center font-medium text-blue-700">국민연금</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colspan="2" class="px-4 py-8 text-center text-gray-500">
+                <div class="flex flex-col items-center gap-2">
+                  <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                  </svg>
+                  <p>"${searchQuery}" 검색 결과가 없습니다.</p>
+                  <p class="text-xs">상품명 또는 금융회사명으로 검색해 보세요.</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        `;
+        return;
+      }
+
+      // 헤더 행 생성 (연령, 국민연금 열 고정)
+      let headerRow = '<tr class="bg-gray-100">';
+      headerRow += '<th class="px-2 py-2 text-center font-medium text-gray-700 sticky left-0 z-20 bg-gray-100 min-w-[60px] border-r border-gray-200">연령</th>';
+      headerRow += '<th class="px-2 py-2 text-center font-medium text-blue-700 sticky left-[60px] z-20 bg-gray-100 min-w-[140px] border-r border-gray-300">국민연금<br><span class="text-xs">(물가연동)</span></th>';
+      for (const pp of allProducts) {
+        const displayName = pp.productName.length > 12 ? pp.productName.substring(0, 12) + '...' : pp.productName;
+        // 과거/미래 수익률 정보 표시
+        const pastRate = ((pp.return || 0) * 100).toFixed(1);
+        const futureRate = ((pp.futureReturn ?? FUTURE_RETURN_RATE) * 100).toFixed(1);
+        const returnYears = pp.returnYears ?? 10;
+        const returnInfo = pp.returnYears
+          ? `${returnYears}년 ${pastRate}% → ${futureRate}%`
+          : `고정 ${pastRate}%`;
+        headerRow += `<th class="px-2 py-2 text-center font-medium text-gray-700 min-w-[160px]" title="${pp.productName}\n과거 ${returnYears}년 수익률: ${pastRate}%\n미래 예상 수익률: ${futureRate}%">${displayName}<br><span class="text-xs text-gray-500">(${returnInfo})</span></th>`;
+      }
+      headerRow += '</tr>';
+
+      // 연도 계산을 위한 현재 나이와 현재 연도
+      const currentAge = result.formData.currentAge;
+      const currentYear = new Date().getFullYear();
+
+      // 데이터 행 생성 (65세~기대수명 매년)
+      let dataRows = '';
+
+      for (let age = startAge; age <= endAge; age++) {
+        const npsData = npsReceiving.find(r => r.age === age);
+        if (!npsData) continue;
+
+        // 해당 나이가 되는 연도 계산
+        const yearAtAge = currentYear + (age - currentAge);
+
+        const isHighlight = age === startAge || age === endAge;
+        const rowClass = isHighlight ? 'bg-yellow-50' : (age % 5 === 0 ? 'bg-gray-50' : '');
+
+        // 행 배경색 결정 (sticky 셀에도 동일하게 적용)
+        const bgColor = isHighlight ? 'bg-yellow-50' : (age % 5 === 0 ? 'bg-gray-50' : 'bg-white');
+
+        dataRows += `<tr class="border-b ${rowClass}">`;
+        dataRows += `<td class="px-2 py-2 text-center font-medium text-gray-700 sticky left-0 z-10 ${bgColor} min-w-[60px] border-r border-gray-200">${age}세<br><span class="text-xs text-gray-500">(${yearAtAge}년)</span></td>`;
+
+        // 국민연금 (물가연동) - 연간 + (월)
+        const npsAnnual = npsData.monthlyBenefit * 12;
+        dataRows += `<td class="px-2 py-2 text-center text-blue-700 font-bold sticky left-[60px] z-10 ${bgColor} min-w-[140px] border-r border-gray-300">${formatCurrency(npsAnnual)}<br><span class="text-xs font-normal">(월 ${formatCurrency(npsData.monthlyBenefit)})</span></td>`;
+
+        // 전체 개인연금 상품들
+        for (const pp of allProducts) {
+          const ppData = pp.receiving.find(r => r.age === age);
+          const ppAnnual = (ppData?.monthlyBenefit || 0) * 12;
+          dataRows += `<td class="px-2 py-2 text-center">
+            <span class="text-gray-700">${formatCurrency(ppAnnual)}</span><br>
+            <span class="text-xs">(월 ${formatCurrency(ppData?.monthlyBenefit || 0)})</span>
+          </td>`;
+        }
+
+        dataRows += '</tr>';
+      }
+
+      // 총 수령액 행 (수령 기간에 따라 동적 계산)
+      const years = endAge - startAge + 1;
+      const totalNPS = npsReceiving.reduce((sum, r) => sum + r.monthlyBenefit * 12, 0);
+      let totalRow = '<tr class="bg-gray-200 font-bold">';
+      totalRow += `<td class="px-2 py-2 text-center text-gray-800 sticky left-0 z-10 bg-gray-200 min-w-[60px] border-r border-gray-200">${years}년 총합</td>`;
+      totalRow += `<td class="px-2 py-2 text-center text-blue-800 sticky left-[60px] z-10 bg-gray-200 min-w-[140px] border-r border-gray-300">${formatCurrency(totalNPS)}</td>`;
+
+      for (const pp of allProducts) {
+        const totalPP = pp.receiving.reduce((sum, r) => sum + r.monthlyBenefit * 12, 0);
+        totalRow += `<td class="px-2 py-2 text-center text-gray-800">${formatCurrency(totalPP)}</td>`;
+      }
+      totalRow += '</tr>';
+
+      table.innerHTML = `
+        <thead>${headerRow}</thead>
+        <tbody>
+          ${dataRows}
+          ${totalRow}
         </tbody>
       `;
     }
@@ -685,6 +1513,32 @@
     }
 
     /**
+     * 로딩 상태 표시
+     */
+    function showLoading() {
+      const btn = document.getElementById('calculate-btn');
+      const btnText = document.getElementById('btn-text');
+      const btnSpinner = document.getElementById('btn-spinner');
+
+      if (btn) btn.disabled = true;
+      if (btnText) btnText.textContent = '계산 중...';
+      if (btnSpinner) btnSpinner.classList.remove('hidden');
+    }
+
+    /**
+     * 로딩 상태 해제
+     */
+    function hideLoading() {
+      const btn = document.getElementById('calculate-btn');
+      const btnText = document.getElementById('btn-text');
+      const btnSpinner = document.getElementById('btn-spinner');
+
+      if (btn) btn.disabled = false;
+      if (btnText) btnText.textContent = '계산하기';
+      if (btnSpinner) btnSpinner.classList.add('hidden');
+    }
+
+    /**
      * 계산 버튼 클릭 핸들러
      */
     function handleCalculate() {
@@ -697,7 +1551,15 @@
         return;
       }
 
-      executeCalculation(formData);
+      // 로딩 표시 후 약간의 지연을 두어 UI 업데이트 보장
+      showLoading();
+      setTimeout(() => {
+        try {
+          executeCalculation(formData);
+        } finally {
+          hideLoading();
+        }
+      }, 50);
     }
 
     /**
@@ -705,31 +1567,57 @@
      * @param {Object} data - 검증된 폼 데이터
      */
     function executeCalculation(data) {
-      // 임금 곡선 계산
+      // 임금 곡선 계산 (30세부터)
       const incomes = calculateWageCurve(data.currentAge, data.currentIncome);
+
+      // 기대수명 계산 (입력한 나이 기준)
+      const expectedLifespan = getExpectedLifespan(data.currentAge);
+      const startAge = APP_DATA?.receiving?.start_age ?? DEFAULT_DATA.receiving.start_age;
 
       // 국민연금 계산
       const npsResult = calculateNPS(incomes, data.jobType);
       const npsTax = calculateNPSTax(npsResult.monthlyBenefit);
 
-      // 개인연금 계산 (전체 상품)
-      const privatePensionResults = calculatePrivatePension(incomes);
-      const privatePensionWithTax = privatePensionResults.map(result => ({
-        ...result,
-        tax: calculatePrivatePensionTax(result.monthlyBenefit, 60)
-      }));
+      // 65세부터 기대수명까지 국민연금 수령액 (물가연동)
+      const npsReceiving = calculateNPSWithInflation(npsTax.netAmount, INFLATION_RATE, expectedLifespan);
+
+      // 개인연금 계산 (전체 상품: 기존 3개 + 펀드 상품)
+      const privatePensionResults = calculatePrivatePension(incomes, null, true, data.jobType);
+      const privatePensionWithTax = privatePensionResults.map(result => {
+        const tax = calculatePrivatePensionTax(result.monthlyBenefit, startAge);
+        // 65세부터 기대수명까지 개인연금 수령액 (고정)
+        const receiving = calculatePrivatePensionReceiving(result.totalBalance, INFLATION_RATE, expectedLifespan);
+        return {
+          ...result,
+          tax,
+          receiving
+        };
+      });
 
       // 결과 저장 (UI-002에서 사용)
       window.calculationResult = {
         formData: data,
         incomes,
-        nps: { ...npsResult, tax: npsTax },
-        privatePensions: privatePensionWithTax
+        expectedLifespan,
+        nps: { ...npsResult, tax: npsTax, receiving: npsReceiving },
+        privatePensions: privatePensionWithTax,
+        inflationRate: INFLATION_RATE
       };
+
+      // 물가상승률 표시 업데이트
+      const inflationDisplay = document.getElementById('inflation-rate-display');
+      if (inflationDisplay) {
+        inflationDisplay.textContent = `${(INFLATION_RATE * 100).toFixed(1)}%`;
+      }
 
       // 결과 테이블 표시 (UI-002 함수 호출)
       if (typeof renderResultTable === 'function') {
         renderResultTable(window.calculationResult);
+      }
+
+      // 60-80세 수령 테이블 표시
+      if (typeof renderReceivingTable === 'function') {
+        renderReceivingTable(window.calculationResult);
       }
 
       // 결과 컨테이너 표시
@@ -887,7 +1775,7 @@
         },
 
         // ============================================================
-        // @TEST:CALC-001 | SPEC: SPEC-CALC-001/spec.md
+        // @TEST:CALC-001 | SPEC: SPEC-CALC-001/spec.md (30세 기준 수정)
         // ============================================================
         {
           name: 'calculateWageCurve 함수 존재',
@@ -898,18 +1786,25 @@
           test: () => typeof getWageGrowthRate === 'function'
         },
         {
-          name: '30세 5000만원 → 31개 결과 반환',
-          test: () => calculateWageCurve(30, 50000000).length === 31
+          name: '35세 5000만원 → 31개 결과 (30세~60세)',
+          test: () => calculateWageCurve(35, 50000000).length === 29
         },
         {
-          name: '첫 번째 결과가 현재 나이/소득',
+          name: '35세 입력 → 첫 결과는 30세',
           test: () => {
-            const result = calculateWageCurve(30, 50000000);
-            return result[0]?.age === 30 && result[0]?.income === 50000000;
+            const result = calculateWageCurve(35, 50000000);
+            return result[0]?.age === 30;
           }
         },
         {
-          name: '30대 상승률 5% 적용',
+          name: '25세 입력 → 25세부터 계산 (30세 미만)',
+          test: () => {
+            const result = calculateWageCurve(25, 30000000);
+            return result[0]?.age === 25 && result.length === 36; // 25-60세 = 36년
+          }
+        },
+        {
+          name: '30세 상승률 5% 적용',
           test: () => {
             const result = calculateWageCurve(30, 50000000);
             return result[1]?.income === Math.round(50000000 * 1.05);
@@ -924,8 +1819,8 @@
           test: () => calculateWageCurve(30, -1000).length === 0
         },
         {
-          name: '59세 → 2개 결과 (59, 60)',
-          test: () => calculateWageCurve(59, 50000000).length === 2
+          name: '59세 → 31개 결과 (30세~60세)',
+          test: () => calculateWageCurve(59, 50000000).length === 29
         },
 
         // ============================================================
@@ -1162,6 +2057,79 @@
         {
           name: 'formatCurrency null → "-"',
           test: () => formatCurrency(null) === '-'
+        },
+
+        // ============================================================
+        // @TEST:CSV-001 | CSV 로딩 및 파싱 테스트
+        // ============================================================
+        {
+          name: 'parseCSV 함수 존재',
+          test: () => typeof parseCSV === 'function'
+        },
+        {
+          name: 'calculateAverageInflation 함수 존재',
+          test: () => typeof calculateAverageInflation === 'function'
+        },
+        {
+          name: 'BANK_PENSION_PRODUCTS 배열 존재',
+          test: () => Array.isArray(BANK_PENSION_PRODUCTS)
+        },
+        {
+          name: 'ALL_PENSION_PRODUCTS 배열 존재',
+          test: () => Array.isArray(ALL_PENSION_PRODUCTS)
+        },
+        {
+          name: 'INFLATION_RATE가 숫자',
+          test: () => typeof INFLATION_RATE === 'number'
+        },
+        {
+          name: 'INFLATION_RATE가 0~0.1 범위',
+          test: () => INFLATION_RATE >= 0 && INFLATION_RATE <= 0.1
+        },
+
+        // ============================================================
+        // @TEST:CALC-004 | 60-80세 수령액 계산 테스트
+        // ============================================================
+        {
+          name: 'calculateNPSWithInflation 함수 존재',
+          test: () => typeof calculateNPSWithInflation === 'function'
+        },
+        {
+          name: 'calculatePrivatePensionReceiving 함수 존재',
+          test: () => typeof calculatePrivatePensionReceiving === 'function'
+        },
+        {
+          name: '국민연금 물가연동 21개 결과 (65~85세)',
+          test: () => calculateNPSWithInflation(1000000).length === 21
+        },
+        {
+          name: '국민연금 85세 수령액 > 65세 수령액 (물가연동)',
+          test: () => {
+            const results = calculateNPSWithInflation(1000000);
+            return results[20].monthlyBenefit > results[0].monthlyBenefit;
+          }
+        },
+        {
+          name: '개인연금 21개 결과 (65~85세)',
+          test: () => calculatePrivatePensionReceiving(100000000).length === 21
+        },
+        {
+          name: '개인연금 고정 수령액 (명목)',
+          test: () => {
+            const results = calculatePrivatePensionReceiving(100000000);
+            return results[0].monthlyBenefit === results[20].monthlyBenefit;
+          }
+        },
+        {
+          name: '개인연금 실질가치 하락',
+          test: () => {
+            const results = calculatePrivatePensionReceiving(100000000);
+            return results[20].realValue < results[0].realValue;
+          }
+        },
+        {
+          name: 'renderReceivingTable 함수 존재',
+          test: () => typeof renderReceivingTable === 'function'
         }
       ];
 

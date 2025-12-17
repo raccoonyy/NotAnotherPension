@@ -1,5 +1,5 @@
 {
-  "updated_at": "2025-12-05",
+  "updated_at": "2025-12-06",
   "nps": {
     "a_value": 2989352,
     "replacement_rate": 0.40,
@@ -17,5 +17,14 @@
     "40s": 0.03,
     "50s_early": 0.00,
     "50s_late": -0.02
+  },
+  "employment": {
+    "average_start_age": 32,
+    "average_start_income": 30000000
+  },
+  "receiving": {
+    "start_age": 65,
+    "end_age": 85,
+    "years": 20
   }
 }
