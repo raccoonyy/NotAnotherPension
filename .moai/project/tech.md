@@ -8,7 +8,7 @@ author: @tech-lead
 priority: medium
 ---
 
-# yourfuture Technology Stack
+# NotAnotherPension Technology Stack
 
 ## HISTORY
 
@@ -167,7 +167,7 @@ python -m http.server 8000
 
 - **주 채널**: GitHub Pages
 - **배포 파일**: `index.html`, `data.json`
-- **URL**: `https://{username}.github.io/yourfuture/`
+- **URL**: `https://{username}.github.io/NotAnotherPension/`
 
 ### 2. 배포 방법
 
@@ -211,8 +211,8 @@ jobs:
 
 ```bash
 # 프로젝트 클론
-git clone https://github.com/{username}/yourfuture.git
-cd yourfuture
+git clone https://github.com/{username}/NotAnotherPension.git
+cd NotAnotherPension
 
 # 로컬 서버 실행 (CORS 문제 방지)
 python -m http.server 8000
@@ -224,7 +224,7 @@ python -m http.server 8000
 ### 4. 파일 구조
 
 ```
-yourfuture/
+NotAnotherPension/
 ├── index.html          # 메인 페이지 (필수)
 ├── data.json           # 데이터 파일 (필수)
 ├── update_data.py      # 데이터 갱신 스크립트

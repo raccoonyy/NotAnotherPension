@@ -156,7 +156,7 @@ Feature: 데이터 타입 유효성
 ### 1. 로컬 서버 실행
 
 ```bash
-cd /Users/alan.kim/workspace/yourfuture
+cd /Users/alan.kim/workspace/NotAnotherPension
 python -m http.server 8000
 ```
 

@@ -1,4 +1,4 @@
-# yourfuture - MoAI-Agentic Development Kit
+# NotAnotherPension - MoAI-Agentic Development Kit
 
 **SPEC-First TDD Development with Alfred SuperAgent**
 
@@ -720,7 +720,7 @@ Alfred가 모든 코드에 적용하는 품질 기준:
 
 ## 프로젝트 정보
 
-- **이름**: yourfuture
+- **이름**: NotAnotherPension
 - **설명**: 
 - **버전**: 0.1.0
 - **모드**: personal

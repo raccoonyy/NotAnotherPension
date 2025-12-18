@@ -8,7 +8,7 @@ author: @project-owner
 priority: high
 ---
 
-# yourfuture Product Definition
+# NotAnotherPension Product Definition
 
 ## HISTORY
 
@@ -33,7 +33,7 @@ priority: high
 
 > **"국민연금 vs 개인연금, 똑같은 돈으로 뭐가 더 유리할까?"**
 
-yourfuture는 **한국의 국민연금과 개인연금(IRP, 연금저축)의 예상 수령액을 세후 기준으로 비교**할 수 있는 정적 웹페이지입니다.
+NotAnotherPension은 **한국의 국민연금과 개인연금(IRP, 연금저축)의 예상 수령액을 세후 기준으로 비교**할 수 있는 정적 웹페이지입니다.
 
 ### 핵심 가치 제안
 

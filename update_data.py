@@ -137,7 +137,7 @@ def validate_data() -> bool:
 
 if __name__ == "__main__":
     print("=" * 50)
-    print("yourfuture 데이터 갱신 스크립트")
+    print("NotAnotherPension 데이터 갱신 스크립트")
     print("=" * 50)
 
     # 데이터 갱신
