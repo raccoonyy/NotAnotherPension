@@ -1,6 +1,6 @@
 # 문서 동기화 보고서
 
-> **생성일**: 2025-12-06
+> **생성일**: 2025-12-18
 > **모드**: Personal
 > **프로젝트**: yourfuture
 
@@ -141,6 +141,14 @@
 | `renderResultTable()` | 결과 테이블 렌더링 |
 | `renderSummaryCards()` | 요약 카드 렌더링 |
 
+### 연금 개시 연령 (UI 개선)
+| 함수 | 역할 |
+|------|------|
+| `getLegalPensionStartAge()` | 출생년도 기반 법정 연금 개시 연령 계산 |
+| `getBirthYearFromAge()` | 현재 나이로 출생년도 계산 |
+| `getPensionAdjustmentRate()` | 조기/연기 연금 조정률 계산 |
+| `updatePensionAgeInfo()` | 연금 연령 정보 UI 갱신 |
+
 ---
 
 ## Git 커밋 이력
@@ -176,6 +184,8 @@ cd88968 📝 DOCS: DATA-001 SPEC 상태 업데이트 (completed)
 4. **세금 계산** - 세후 실수령액 표시
 5. **입력 폼** - 직업/나이/소득 입력
 6. **결과 테이블** - 가로 스크롤 연도별 비교
+7. **연금 개시 연령 선택** - 60~70세 선택, 조기/연기 연금 자동 계산
+8. **데이터 출처 CSV 다운로드** - 원본 데이터 다운로드 기능
 
 ### 기술 스택
 - Vanilla JavaScript (ES6+)

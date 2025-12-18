@@ -50,6 +50,7 @@
           </label>
           <div class="flex items-center">
             <input type="number" id="currentAge" value="30" min="20" max="59"
+                   onchange="updatePensionAgeInfo()"
                    class="w-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
             <span class="ml-2 text-gray-600">세</span>
           </div>
@@ -77,6 +78,32 @@
                    class="w-32 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
             <span class="ml-2 text-gray-600">만원</span>
           </div>
+        </div>
+
+        <!-- 연금 개시 연령 -->
+        <div class="mb-4">
+          <label for="pensionStartAge" class="block text-sm font-medium text-gray-700 mb-2">
+            연금 개시 연령
+            <span id="pension-age-info" class="text-xs text-gray-500 ml-1"></span>
+          </label>
+          <div class="flex items-center gap-2">
+            <select id="pensionStartAge" onchange="updatePensionAgeInfo()"
+                    class="w-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="60">60세</option>
+              <option value="61">61세</option>
+              <option value="62">62세</option>
+              <option value="63">63세</option>
+              <option value="64">64세</option>
+              <option value="65" selected>65세</option>
+              <option value="66">66세</option>
+              <option value="67">67세</option>
+              <option value="68">68세</option>
+              <option value="69">69세</option>
+              <option value="70">70세</option>
+            </select>
+            <span id="pension-adjustment" class="text-sm"></span>
+          </div>
+          <p id="pension-age-note" class="text-xs text-gray-500 mt-1"></p>
         </div>
 
         <!-- 오류 메시지 -->
@@ -108,15 +135,25 @@
           <div class="space-y-3 text-sm text-gray-600">
             <div class="flex items-start gap-2">
               <span class="text-blue-500 mt-0.5">•</span>
-              <div>
-                <span class="font-medium text-gray-700">소비자물가 상승률: 과거 20년 평균인 2.5% 적용</span>
+              <div class="flex-1">
+                <div class="flex items-center gap-2">
+                  <span class="font-medium text-gray-700">소비자물가 상승률: 과거 20년 평균인 2.5% 적용</span>
+                  <a href="./data/consumer-price-inflation.csv" download title="CSV 다운로드" class="text-gray-400 hover:text-blue-600 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                  </a>
+                </div>
                 <p class="text-xs text-gray-500 mt-0.5"><a href="https://snapshot.bok.or.kr/dashboard/C6" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">한국은행</a></p>
               </div>
             </div>
             <div class="flex items-start gap-2">
               <span class="text-blue-500 mt-0.5">•</span>
-              <div>
-                <span class="font-medium text-gray-700">개인연금 수익률: 과거 실적 + 미래 예상(7.72%)</span>
+              <div class="flex-1">
+                <div class="flex items-center gap-2">
+                  <span class="font-medium text-gray-700">개인연금 수익률: 과거 실적 + 미래 예상(7.72%)</span>
+                  <a href="./data/100lifeplan_fund.csv" download title="CSV 다운로드" class="text-gray-400 hover:text-blue-600 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                  </a>
+                </div>
                 <p class="text-xs text-gray-500 mt-0.5">처음 3~10년: 각 펀드의 실제 수익률 (3/5/7/10년 데이터)</p>
                 <p class="text-xs text-gray-500 mt-0.5">이후 기간: 상위 500개 펀드 평균 7.72% 적용</p>
                 <p class="text-xs text-gray-500 mt-0.5"><a href="https://www.fss.or.kr/fss/lifeplan/goodsCmpr/list.do?menuNo=200961" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">금융감독원 연금저축 비교공시</a></p>
@@ -131,23 +168,33 @@
             </div>
             <div class="flex items-start gap-2">
               <span class="text-blue-500 mt-0.5">•</span>
-              <div>
-                <span class="font-medium text-gray-700">신입사원 초임 평균(2023년 조사): 3,800만원</span>
+              <div class="flex-1">
+                <div class="flex items-center gap-2">
+                  <span class="font-medium text-gray-700">신입사원 초임 평균(2023년 조사): 3,800만원</span>
+                  <a href="./data/new_hire_compensations.csv" download title="CSV 다운로드" class="text-gray-400 hover:text-blue-600 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                  </a>
+                </div>
                 <p class="text-xs text-gray-500 mt-0.5"><a href="https://kosis.kr/statHtml/statHtml.do?tblId=DT_14217M_241&orgId=115" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">KOSIS 2023</a></p>
               </div>
             </div>
             <div class="flex items-start gap-2">
               <span class="text-blue-500 mt-0.5">•</span>
-              <div>
-                <span class="font-medium text-gray-700">기대수명: 65세 도달 연도의 기대수명으로 자동 계산 </span>
+              <div class="flex-1">
+                <div class="flex items-center gap-2">
+                  <span class="font-medium text-gray-700">기대수명: 65세 도달 연도의 기대수명으로 자동 계산</span>
+                  <a href="./data/age_expectations.csv" download title="CSV 다운로드" class="text-gray-400 hover:text-blue-600 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                  </a>
+                </div>
                 <p class="text-xs text-gray-500 mt-0.5"><a href="https://kosis.kr/statHtml/statHtml.do?orgId=101&tblId=DT_1BPA003" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">KOSIS 장래인구추계</a></p>
               </div>
             </div>
             <div class="flex items-start gap-2">
               <span class="text-blue-500 mt-0.5">•</span>
               <div>
-                <span class="font-medium text-gray-700">국민연금 개정안: 보험료율 9%→13%, 소득대체율 43%</span>
-                <p class="text-xs text-gray-500 mt-0.5"><a href="https://www.nps.or.kr" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">국민연금공단</a></p>
+                <span class="font-medium text-gray-700">국민연금 개정안: 보험료율 9% → 13%, 소득대체율 43%</span>
+                <p class="text-xs text-gray-500 mt-0.5"><a href="https://www.nps.or.kr/pnsinfo/ntpsklg/getOHAF0104M0.do" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">국민연금공단</a></p>
               </div>
             </div>
           </div>
@@ -261,6 +308,10 @@
       receiving: {
         start_age: 65,
         end_age: 85,
+        // 조기연금: 1년 조기 수령 시 감액률 (연 6%, 최대 5년 = 30%)
+        early_pension_reduction_per_year: 0.06,
+        // 연기연금: 1년 연기 시 증액률 (연 7.2%, 최대 5년 = 36%)
+        deferred_pension_increase_per_year: 0.072,
         years: 20
       }
     };
@@ -648,6 +699,7 @@
         await loadAllData();
         enableCalculation();
         setupPensionSearch();
+        updatePensionAgeInfo();
       } catch (error) {
         console.error('데이터 로드 오류:', error);
         const loadingStatus = document.getElementById('loading-status');
@@ -814,6 +866,108 @@
     }
 
     /**
+     * 출생연도 기반 법정 연금 개시 연령 계산
+     * @param {number} birthYear - 출생연도
+     * @returns {number} 법정 연금 개시 연령
+     */
+    function getLegalPensionStartAge(birthYear) {
+      if (birthYear >= 1969) return 65;
+      if (birthYear >= 1965) return 64;
+      if (birthYear >= 1961) return 63;
+      if (birthYear >= 1957) return 62;
+      if (birthYear >= 1953) return 61;
+      return 60;  // 1952년 이전 출생
+    }
+
+    /**
+     * 현재 나이로부터 출생연도 추정
+     * @param {number} currentAge - 현재 나이
+     * @returns {number} 추정 출생연도
+     */
+    function getBirthYearFromAge(currentAge) {
+      const currentYear = new Date().getFullYear();
+      return currentYear - currentAge;
+    }
+
+    /**
+     * 조기/연기 연금 조정률 계산
+     * 조기연금: 법정 개시 연령보다 일찍 수령 시 연 6% 감액 (최대 5년, 30%)
+     * 연기연금: 법정 개시 연령보다 늦게 수령 시 연 7.2% 증액 (최대 5년, 36%)
+     * @param {number} selectedAge - 선택한 개시 연령
+     * @param {number} legalAge - 법정 개시 연령
+     * @returns {{rate: number, type: string, years: number}} 조정률 정보
+     */
+    function getPensionAdjustmentRate(selectedAge, legalAge) {
+      const diff = selectedAge - legalAge;
+      const earlyRate = APP_DATA?.receiving?.early_pension_reduction_per_year ?? 0.06;
+      const deferredRate = APP_DATA?.receiving?.deferred_pension_increase_per_year ?? 0.072;
+
+      if (diff < 0) {
+        // 조기연금 (최대 5년 조기)
+        const years = Math.min(Math.abs(diff), 5);
+        return {
+          rate: 1 - (years * earlyRate),  // 감액률 적용
+          type: 'early',
+          years: years
+        };
+      } else if (diff > 0) {
+        // 연기연금 (최대 5년 연기)
+        const years = Math.min(diff, 5);
+        return {
+          rate: 1 + (years * deferredRate),  // 증액률 적용
+          type: 'deferred',
+          years: years
+        };
+      }
+      return { rate: 1, type: 'normal', years: 0 };
+    }
+
+    /**
+     * 연금 개시 연령 정보 업데이트 (UI)
+     */
+    function updatePensionAgeInfo() {
+      const currentAge = parseInt(document.getElementById('currentAge')?.value) || 30;
+      const birthYear = getBirthYearFromAge(currentAge);
+      const legalAge = getLegalPensionStartAge(birthYear);
+      const selectedAge = parseInt(document.getElementById('pensionStartAge')?.value) || 65;
+
+      // 법정 연령 표시
+      const ageInfoEl = document.getElementById('pension-age-info');
+      if (ageInfoEl) {
+        ageInfoEl.textContent = `(법정: ${legalAge}세)`;
+      }
+
+      // 조정률 계산 및 표시
+      const adjustment = getPensionAdjustmentRate(selectedAge, legalAge);
+      const adjustmentEl = document.getElementById('pension-adjustment');
+      const noteEl = document.getElementById('pension-age-note');
+
+      if (adjustmentEl) {
+        if (adjustment.type === 'early') {
+          const reductionPercent = ((1 - adjustment.rate) * 100).toFixed(0);
+          adjustmentEl.innerHTML = `<span class="text-red-600">-${reductionPercent}% 감액</span>`;
+          if (noteEl) noteEl.textContent = `조기노령연금: ${adjustment.years}년 조기 수령`;
+        } else if (adjustment.type === 'deferred') {
+          const increasePercent = ((adjustment.rate - 1) * 100).toFixed(1);
+          adjustmentEl.innerHTML = `<span class="text-green-600">+${increasePercent}% 증액</span>`;
+          if (noteEl) noteEl.textContent = `연기연금: ${adjustment.years}년 연기 수령`;
+        } else {
+          adjustmentEl.textContent = '';
+          if (noteEl) noteEl.textContent = '법정 개시 연령으로 수령';
+        }
+      }
+
+      // select 기본값 설정 (처음 로드 시)
+      const selectEl = document.getElementById('pensionStartAge');
+      if (selectEl && !selectEl.dataset.initialized) {
+        selectEl.value = legalAge.toString();
+        selectEl.dataset.initialized = 'true';
+        // 다시 호출하여 UI 업데이트
+        updatePensionAgeInfo();
+      }
+    }
+
+    /**
      * 기준소득월액 산정 (상하한 적용)
      * @param {number} annualIncome - 연소득
      * @returns {number} 월 기준소득 (상하한 적용)
@@ -836,10 +990,13 @@
      *   employerContribution: number
      * }}
      */
-    function calculateNPS(incomes, jobType = 'laborer') {
+    function calculateNPS(incomes, jobType = 'laborer', pensionStartAge = null, currentAge = null) {
       if (!incomes || incomes.length === 0) {
         return {
           monthlyBenefit: 0,
+          baseBenefit: 0,
+          adjustmentRate: 1,
+          adjustmentType: 'normal',
           totalContribution: 0,
           selfContribution: 0,
           employerContribution: 0
@@ -875,12 +1032,29 @@
       const contributionMonths = incomes.length * 12;
 
       // 국민연금 산식 (간소화): (A + B) × 소득대체율 × 가입월수/480 / 12
-      const monthlyBenefit = Math.round(
+      const baseBenefit = Math.round(
         ((aValue + bValue) * replacementRate * (contributionMonths / NPS_CONSTANTS.FULL_MONTHS)) / 12
       );
 
+      // 조기/연기 연금 조정률 계산
+      let adjustmentRate = 1;
+      let adjustmentType = 'normal';
+      if (pensionStartAge !== null && currentAge !== null) {
+        const birthYear = getBirthYearFromAge(currentAge);
+        const legalAge = getLegalPensionStartAge(birthYear);
+        const adjustment = getPensionAdjustmentRate(pensionStartAge, legalAge);
+        adjustmentRate = adjustment.rate;
+        adjustmentType = adjustment.type;
+      }
+
+      // 조정률 적용
+      const monthlyBenefit = Math.round(baseBenefit * adjustmentRate);
+
       return {
         monthlyBenefit,
+        baseBenefit,
+        adjustmentRate,
+        adjustmentType,
         totalContribution: Math.round(selfContribution + employerContribution),
         selfContribution: Math.round(selfContribution),
         employerContribution: Math.round(employerContribution)
@@ -1001,15 +1175,16 @@
     // ============================================================
 
     /**
-     * 국민연금 물가연동 수령액 계산 (60-80세)
+     * 국민연금 물가연동 수령액 계산 (개시연령~기대수명)
      * 국민연금은 매년 물가상승률만큼 수령액 인상
-     * @param {number} baseMonthlyBenefit - 65세 기준 월 수령액
+     * @param {number} baseMonthlyBenefit - 개시연령 기준 월 수령액
      * @param {number} [inflationRate] - 물가상승률 (기본값: CSV에서 로드)
      * @param {number} [expectedLifespan] - 기대수명 (기본값: 설정값)
+     * @param {number} [pensionStartAge] - 연금 개시 연령 (기본값: 65세)
      * @returns {Array<{age: number, monthlyBenefit: number, realValue: number}>}
      */
-    function calculateNPSWithInflation(baseMonthlyBenefit, inflationRate = INFLATION_RATE, expectedLifespan = null) {
-      const startAge = APP_DATA?.receiving?.start_age ?? DEFAULT_DATA.receiving.start_age;
+    function calculateNPSWithInflation(baseMonthlyBenefit, inflationRate = INFLATION_RATE, expectedLifespan = null, pensionStartAge = null) {
+      const startAge = pensionStartAge || (APP_DATA?.receiving?.start_age ?? DEFAULT_DATA.receiving.start_age);
       const endAge = expectedLifespan || (APP_DATA?.receiving?.end_age ?? DEFAULT_DATA.receiving.end_age);
       const years = endAge - startAge;
       const results = [];
@@ -1029,15 +1204,16 @@
     }
 
     /**
-     * 개인연금 수령액 계산 (65세~기대수명)
+     * 개인연금 수령액 계산 (개시연령~기대수명)
      * 개인연금은 고정 수령액, 실질가치 하락
      * @param {number} totalBalance - 총 적립액
      * @param {number} [inflationRate] - 물가상승률 (기본값: CSV에서 로드)
      * @param {number} [expectedLifespan] - 기대수명 (기본값: 설정값)
+     * @param {number} [pensionStartAge] - 연금 개시 연령 (기본값: 65세)
      * @returns {Array<{age: number, monthlyBenefit: number, realValue: number}>}
      */
-    function calculatePrivatePensionReceiving(totalBalance, inflationRate = INFLATION_RATE, expectedLifespan = null) {
-      const startAge = APP_DATA?.receiving?.start_age ?? DEFAULT_DATA.receiving.start_age;
+    function calculatePrivatePensionReceiving(totalBalance, inflationRate = INFLATION_RATE, expectedLifespan = null, pensionStartAge = null) {
+      const startAge = pensionStartAge || (APP_DATA?.receiving?.start_age ?? DEFAULT_DATA.receiving.start_age);
       const endAge = expectedLifespan || (APP_DATA?.receiving?.end_age ?? DEFAULT_DATA.receiving.end_age);
       const years = endAge - startAge;
       const fixedMonthly = Math.round(totalBalance / ((years + 1) * 12));
@@ -1449,6 +1625,7 @@
     function getFormData() {
       const jobType = document.querySelector('input[name="jobType"]:checked')?.value || 'laborer';
       const currentAge = parseInt(document.getElementById('currentAge')?.value) || 0;
+      const pensionStartAge = parseInt(document.getElementById('pensionStartAge')?.value) || 65;
 
       let currentIncome = 0;
       if (jobType === 'laborer') {
@@ -1463,6 +1640,7 @@
         jobType,
         currentAge,
         currentIncome,
+        pensionStartAge,
         isValid: validation.isValid,
         errors: validation.errors
       };
@@ -1572,21 +1750,22 @@
 
       // 기대수명 계산 (입력한 나이 기준)
       const expectedLifespan = getExpectedLifespan(data.currentAge);
-      const startAge = APP_DATA?.receiving?.start_age ?? DEFAULT_DATA.receiving.start_age;
+      // 연금 개시 연령 (사용자 선택 또는 기본값)
+      const startAge = data.pensionStartAge || (APP_DATA?.receiving?.start_age ?? DEFAULT_DATA.receiving.start_age);
 
-      // 국민연금 계산
-      const npsResult = calculateNPS(incomes, data.jobType);
+      // 국민연금 계산 (조기/연기 연금 조정률 적용)
+      const npsResult = calculateNPS(incomes, data.jobType, startAge, data.currentAge);
       const npsTax = calculateNPSTax(npsResult.monthlyBenefit);
 
-      // 65세부터 기대수명까지 국민연금 수령액 (물가연동)
-      const npsReceiving = calculateNPSWithInflation(npsTax.netAmount, INFLATION_RATE, expectedLifespan);
+      // 선택한 개시 연령부터 기대수명까지 국민연금 수령액 (물가연동)
+      const npsReceiving = calculateNPSWithInflation(npsTax.netAmount, INFLATION_RATE, expectedLifespan, startAge);
 
       // 개인연금 계산 (전체 상품: 기존 3개 + 펀드 상품)
       const privatePensionResults = calculatePrivatePension(incomes, null, true, data.jobType);
       const privatePensionWithTax = privatePensionResults.map(result => {
         const tax = calculatePrivatePensionTax(result.monthlyBenefit, startAge);
-        // 65세부터 기대수명까지 개인연금 수령액 (고정)
-        const receiving = calculatePrivatePensionReceiving(result.totalBalance, INFLATION_RATE, expectedLifespan);
+        // 선택한 개시 연령부터 기대수명까지 개인연금 수령액 (고정)
+        const receiving = calculatePrivatePensionReceiving(result.totalBalance, INFLATION_RATE, expectedLifespan, startAge);
         return {
           ...result,
           tax,
