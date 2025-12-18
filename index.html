@@ -150,6 +150,17 @@
               <div class="flex-1">
                 <div class="flex items-center gap-2">
                   <span class="font-medium text-gray-700">개인연금 수익률: 과거 실적 + 미래 예상(7.72%)</span>
+                  <!-- 물음표 아이콘 + Popover -->
+                  <div class="relative inline-block">
+                    <button type="button" onclick="toggleTooltip('return-rate-popover')" class="text-gray-400 hover:text-blue-600 transition-colors focus:outline-none">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </button>
+                    <div id="return-rate-popover" class="hidden absolute z-50 left-0 top-6 w-72 p-3 bg-gray-800 text-white text-xs rounded-lg shadow-lg">
+                      <p>몇몇 개인연금 상품의 7년 혹은 10년 연평균 수익률이 10%를 넘는 경우가 있지만, 이런 수익률을 향후에도 유지하기란 불가능하다고 판단하여 미래의 수익률은 상위 500개 펀드의 수익률 평균인 7.72%로 적용했습니다.</p>
+                      <p class="mt-2 text-yellow-300">💡 7% 수익률이라도 10년간 유지하면 원금의 두 배가 되는 높은 수치입니다.</p>
+                      <div class="absolute -top-2 left-2 w-3 h-3 bg-gray-800 transform rotate-45"></div>
+                    </div>
+                  </div>
                   <a href="./data/100lifeplan_fund.csv" download title="CSV 다운로드" class="text-gray-400 hover:text-blue-600 transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                   </a>
@@ -1600,6 +1611,36 @@
     // @CODE:UI-001 | SPEC: SPEC-UI-001/spec.md
     // 입력 폼 로직
     // ============================================================
+
+    /**
+     * 툴팁 토글 함수
+     * @param {string} tooltipId - 툴팁 요소의 ID
+     */
+    function toggleTooltip(tooltipId) {
+      const tooltip = document.getElementById(tooltipId);
+      if (!tooltip) return;
+
+      const isHidden = tooltip.classList.contains('hidden');
+
+      // 모든 툴팁 닫기
+      document.querySelectorAll('[id$="-popover"]').forEach(el => {
+        el.classList.add('hidden');
+      });
+
+      // 클릭한 툴팁만 토글
+      if (isHidden) {
+        tooltip.classList.remove('hidden');
+      }
+    }
+
+    // 다른 곳 클릭 시 툴팁 닫기
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('[id$="-popover"]') && !e.target.closest('button[onclick*="toggleTooltip"]')) {
+        document.querySelectorAll('[id$="-popover"]').forEach(el => {
+          el.classList.add('hidden');
+        });
+      }
+    });
 
     /**
      * 직업 구분 전환 시 입력 필드 토글
