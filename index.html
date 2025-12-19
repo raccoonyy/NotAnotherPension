@@ -315,16 +315,28 @@
         kospi_10yr_avg: 0.05,
         inflation_rate: 0.025
       },
-      wage_curve: {
-        "20s": 0.05,
-        "30s": 0.05,
-        "40s": 0.03,
-        "50s_early": 0.00,
-        "50s_late": -0.02
+      // 신입사원 초임 데이터 (대졸, 만원) - KOSIS 2018-2023 실측 + 2.68% 역산
+      new_hire_salary: {
+        1965: 755, 1966: 775, 1967: 796, 1968: 817, 1969: 839,
+        1970: 862, 1971: 885, 1972: 909, 1973: 933, 1974: 958,
+        1975: 984, 1976: 1010, 1977: 1037, 1978: 1065, 1979: 1094,
+        1980: 1123, 1981: 1153, 1982: 1184, 1983: 1216, 1984: 1249,
+        1985: 1282, 1986: 1317, 1987: 1352, 1988: 1388, 1989: 1426,
+        1990: 1464, 1991: 1503, 1992: 1543, 1993: 1585, 1994: 1627,
+        1995: 1671, 1996: 1716, 1997: 1762, 1998: 1809, 1999: 1858,
+        2000: 1908, 2001: 1959, 2002: 2011, 2003: 2065, 2004: 2120,
+        2005: 2177, 2006: 2235, 2007: 2295, 2008: 2357, 2009: 2420,
+        2010: 2485, 2011: 2551, 2012: 2620, 2013: 2690, 2014: 2762,
+        2015: 2836, 2016: 2912, 2017: 2990,
+        2018: 3282, 2019: 3338, 2020: 3424, 2021: 3566, 2022: 3664, 2023: 3746,
+        2024: 3846, 2025: 3949, 2026: 4055, 2027: 4164, 2028: 4275,
+        2029: 4390, 2030: 4508
       },
+      // 연평균 임금상승률 (2018-2023 데이터 기반)
+      wage_growth_rate: 0.0268,
       employment: {
         average_start_age: 30,
-        average_start_income: 30000000
+        average_start_income: 37460000
       },
       receiving: {
         start_age: 65,
@@ -783,25 +795,51 @@
     // ============================================================
 
     /**
-     * 연령대별 임금상승률 조회
-     * @param {number} age - 나이
-     * @returns {number} 해당 연령대의 임금상승률
+     * 연평균 임금상승률 조회 (정률, 미래용)
+     * @returns {number} 연평균 임금상승률 (2.68%)
      */
-    function getWageGrowthRate(age) {
-      if (age < 30) return APP_DATA?.wage_curve?.['20s'] ?? 0.05;
-      if (age < 40) return APP_DATA?.wage_curve?.['30s'] ?? 0.05;
-      if (age < 50) return APP_DATA?.wage_curve?.['40s'] ?? 0.03;
-      if (age < 55) return APP_DATA?.wage_curve?.['50s_early'] ?? 0.00;
-      return APP_DATA?.wage_curve?.['50s_late'] ?? -0.02;
+    function getWageGrowthRate() {
+      return APP_DATA?.wage_growth_rate ?? DEFAULT_DATA.wage_growth_rate;
     }
 
     /**
-     * 연령별 예상 소득 계산 (임금 상승 곡선)
-     * - 30세 미만: 입력한 나이부터 60세까지 계산
-     * - 30세 이상: 30세부터 과거 소득 역산 후 60세까지 계산
+     * 30세 취업 시점의 초임 가져오기 (신입사원 초임 데이터 기반)
+     * @param {number} startYear - 30세가 되는 연도
+     * @returns {number} 30세 시점 초임 (원)
+     */
+    function getStartingIncomeFromData(startYear) {
+      const salaryData = APP_DATA?.new_hire_salary ?? DEFAULT_DATA.new_hire_salary;
+
+      // 데이터에 해당 연도가 있으면 사용, 없으면 가장 가까운 연도로 추산
+      if (salaryData[startYear]) {
+        return salaryData[startYear] * 10000; // 만원 → 원
+      }
+
+      // 데이터 범위 확인
+      const years = Object.keys(salaryData).map(Number).sort((a, b) => a - b);
+      const minYear = years[0];
+      const maxYear = years[years.length - 1];
+      const growthRate = getWageGrowthRate();
+
+      if (startYear < minYear) {
+        // 데이터보다 과거: 역산
+        const yearsDiff = minYear - startYear;
+        return Math.round(salaryData[minYear] * 10000 / Math.pow(1 + growthRate, yearsDiff));
+      } else {
+        // 데이터보다 미래: 추산
+        const yearsDiff = startYear - maxYear;
+        return Math.round(salaryData[maxYear] * 10000 * Math.pow(1 + growthRate, yearsDiff));
+      }
+    }
+
+    /**
+     * 연령별 예상 소득 계산 (데이터 기반 + 역산 상승률)
+     * - 30세 초임: 신입사원 초임 데이터에서 가져옴
+     * - 과거 연봉: 30세 초임에서 현재 연봉까지 역산된 상승률 적용
+     * - 미래 연봉: 평균 임금상승률 2.68% 적용
      * @param {number} currentAge - 현재 나이 (20-59)
      * @param {number} currentIncome - 현재 연소득 (원)
-     * @returns {Array<{age: number, year: number, income: number}>} 연도별 소득 배열
+     * @returns {Array<{age: number, year: number, income: number, isCurrentYear: boolean}>} 연도별 소득 배열
      */
     function calculateWageCurve(currentAge, currentIncome) {
       // 입력 검증
@@ -816,9 +854,10 @@
 
       const START_AGE = APP_DATA?.employment?.average_start_age ?? DEFAULT_DATA.employment.average_start_age;
       const currentYear = new Date().getFullYear();
+      const futureGrowthRate = getWageGrowthRate(); // 미래용 2.68%
       const result = [];
 
-      // 30세 미만인 경우: 입력한 나이부터 60세까지 계산
+      // 30세 미만인 경우: 입력한 나이부터 60세까지 정률 상승
       if (currentAge < START_AGE) {
         let income = currentIncome;
         for (let age = currentAge; age <= 60; age++) {
@@ -826,37 +865,47 @@
           result.push({
             age,
             year,
-            income: Math.round(income)
+            income: Math.round(income),
+            isCurrentYear: year === currentYear
           });
           if (age < 60) {
-            const growthRate = getWageGrowthRate(age);
-            income = income * (1 + growthRate);
+            income = income * (1 + futureGrowthRate);
           }
         }
         return result;
       }
 
-      // 30세 이상인 경우: 30세부터 과거 소득 역산 후 미래 예측
-      // 현재 소득에서 30세 소득 역산
-      let income30 = currentIncome;
-      for (let age = currentAge - 1; age >= START_AGE; age--) {
-        const growthRate = getWageGrowthRate(age);
-        income30 = income30 / (1 + growthRate);
-      }
+      // 30세 이상인 경우
+      const startYear = currentYear - (currentAge - START_AGE); // 30세였던 연도
+      const income30 = getStartingIncomeFromData(startYear); // 데이터에서 초임 가져오기
 
-      // 30세부터 60세까지 순차 계산
-      let income = income30;
+      // 30세 초임에서 현재 연봉까지 역산된 연평균 상승률 계산
+      const yearsSince30 = currentAge - START_AGE;
+      const pastGrowthRate = yearsSince30 > 0
+        ? Math.pow(currentIncome / income30, 1 / yearsSince30) - 1
+        : futureGrowthRate;
+
+      // 30세부터 60세까지 계산
       for (let age = START_AGE; age <= 60; age++) {
         const year = currentYear - (currentAge - age);
+        let income;
+
+        if (age <= currentAge) {
+          // 과거~현재: 역산된 상승률 적용
+          const yearsFromStart = age - START_AGE;
+          income = income30 * Math.pow(1 + pastGrowthRate, yearsFromStart);
+        } else {
+          // 미래: 평균 상승률 2.68% 적용
+          const yearsFromCurrent = age - currentAge;
+          income = currentIncome * Math.pow(1 + futureGrowthRate, yearsFromCurrent);
+        }
+
         result.push({
           age,
           year,
-          income: Math.round(income)
+          income: Math.round(income),
+          isCurrentYear: year === currentYear
         });
-        if (age < 60) {
-          const growthRate = getWageGrowthRate(age);
-          income = income * (1 + growthRate);
-        }
       }
 
       return result;
@@ -1288,7 +1337,8 @@
       const grid = document.getElementById('summary-grid');
       if (!grid) return;
 
-      const startAge = APP_DATA?.receiving?.start_age ?? DEFAULT_DATA.receiving.start_age;
+      // 사용자가 선택한 연금 개시 연령 사용
+      const startAge = result.formData?.pensionStartAge || (APP_DATA?.receiving?.start_age ?? DEFAULT_DATA.receiving.start_age);
       const expectedLifespan = result.expectedLifespan;
       const receivingYears = expectedLifespan - startAge;
       const currentYear = new Date().getFullYear();
@@ -1297,15 +1347,15 @@
       // 제목 및 기대수명 정보 업데이트
       const summaryTitle = document.getElementById('summary-title');
       if (summaryTitle) {
-        summaryTitle.textContent = `65세~${expectedLifespan}세 예상 총 수령액 비교`;
+        summaryTitle.textContent = `${startAge}세~${expectedLifespan}세 예상 총 수령액 비교`;
       }
 
       const lifeExpectancyInfo = document.getElementById('life-expectancy-info');
       if (lifeExpectancyInfo) {
-        lifeExpectancyInfo.innerHTML = `📊 ${retirementYear}년(65세) 기준 기대수명 <strong>${expectedLifespan}세</strong> · 수령 기간 <strong>${receivingYears}년</strong>`;
+        lifeExpectancyInfo.innerHTML = `📊 ${retirementYear}년(${startAge}세) 기준 기대수명 <strong>${expectedLifespan}세</strong> · 수령 기간 <strong>${receivingYears}년</strong>`;
       }
 
-      // 국민연금 65세 시점 월 수령액 (수령액 테이블과 동일한 데이터 사용)
+      // 연금 개시 연령 시점 월 수령액 (수령액 테이블과 동일한 데이터 사용)
       const nps65 = result.nps.receiving.find(r => r.age === startAge);
       const npsMonthlyAt65 = nps65?.monthlyBenefit || 0;
       const npsTaxAt65 = calculateNPSTax(npsMonthlyAt65);
@@ -1350,7 +1400,7 @@
           <div class="text-2xl font-bold text-${card.color}-800">${formatCurrency(card.totalReceiving)}</div>
           <div class="text-xs text-${card.color}-500 mt-1">총 수령액</div>
           <div class="text-xs text-${card.color}-400 mt-2 pt-2 border-t border-${card.color}-200">
-            월 ${formatCurrency(card.amount)} (65세 기준)
+            월 ${formatCurrency(card.amount)} (${startAge}세 기준)
           </div>
         </div>
       `).join('');
@@ -1385,12 +1435,18 @@
       }
       privateTotalContribution = Math.round(privateTotalContribution);
 
+      // 현재 연도 확인
+      const currentYear = new Date().getFullYear();
+
       // 헤더 행 생성
       let headerRow = '<tr class="bg-gray-100">';
       headerRow += '<th class="px-3 py-2 text-left font-medium text-gray-700 sticky left-0 bg-gray-100 min-w-[140px]">항목</th>';
       headerRow += '<th class="px-3 py-2 text-center font-medium text-gray-700 min-w-[140px]">납입금 총액</th>';
       for (const item of incomes) {
-        headerRow += `<th class="px-3 py-2 text-center font-medium text-gray-700 min-w-[120px]">${item.year}년<br><span class="text-xs text-gray-500">(${item.age}세)</span></th>`;
+        const isCurrentYear = item.isCurrentYear || item.year === currentYear;
+        const highlightClass = isCurrentYear ? 'bg-yellow-100 border-x-2 border-yellow-400' : '';
+        const yearLabel = isCurrentYear ? `<span class="text-yellow-700 font-bold">${item.year}년</span><br><span class="text-xs text-yellow-600">(${item.age}세, 현재)</span>` : `${item.year}년<br><span class="text-xs text-gray-500">(${item.age}세)</span>`;
+        headerRow += `<th class="px-3 py-2 text-center font-medium text-gray-700 min-w-[120px] ${highlightClass}">${yearLabel}</th>`;
       }
       headerRow += '</tr>';
 
@@ -1399,8 +1455,10 @@
       incomeRow += '<td class="px-3 py-2 font-medium text-gray-700 sticky left-0 bg-white">예상 소득</td>';
       incomeRow += '<td class="px-3 py-2 text-center text-gray-400">-</td>';
       for (const item of incomes) {
+        const isCurrentYear = item.isCurrentYear || item.year === currentYear;
+        const highlightClass = isCurrentYear ? 'bg-yellow-100 border-x-2 border-yellow-400' : '';
         const monthly = Math.round(item.income / 12);
-        incomeRow += `<td class="px-3 py-2 text-center text-gray-600">${formatCurrency(item.income)}<br><span class="text-xs text-gray-500">(월 ${formatCurrency(monthly)})</span></td>`;
+        incomeRow += `<td class="px-3 py-2 text-center text-gray-600 ${highlightClass}">${formatCurrency(item.income)}<br><span class="text-xs text-gray-500">(월 ${formatCurrency(monthly)})</span></td>`;
       }
       incomeRow += '</tr>';
 
@@ -1412,6 +1470,8 @@
         <br><span class="text-xs text-blue-600">(본인 ${formatCurrency(npsSelfContribution)}${jobType === 'laborer' ? `<br>+회사 ${formatCurrency(npsEmployerContribution)}` : ''})</span>
       </td>`;
       for (const item of incomes) {
+        const isCurrentYear = item.isCurrentYear || item.year === currentYear;
+        const highlightClass = isCurrentYear ? 'bg-yellow-100 border-x-2 border-yellow-400' : '';
         const standardMonthly = getStandardMonthlyIncome(item.income);
         // 연도별 보험료율 적용 (2026년 개정 반영)
         const yearRate = getContributionRate(item.year);
@@ -1427,7 +1487,7 @@
         if (jobType === 'laborer') {
           cellContent += `<br><span class="text-xs text-blue-500">(+회사 ${formatCurrency(employerAnnual)})</span>`;
         }
-        npsContribRow += `<td class="px-3 py-2 text-center text-blue-600">${cellContent}</td>`;
+        npsContribRow += `<td class="px-3 py-2 text-center text-blue-600 ${highlightClass}">${cellContent}</td>`;
       }
       npsContribRow += '</tr>';
 
@@ -1439,13 +1499,15 @@
         <br><span class="text-xs text-green-600">(본인 부담)</span>
       </td>`;
       for (const item of incomes) {
+        const isCurrentYear = item.isCurrentYear || item.year === currentYear;
+        const highlightClass = isCurrentYear ? 'bg-yellow-100 border-x-2 border-yellow-400' : '';
         const standardMonthly = getStandardMonthlyIncome(item.income);
         // 연도별 보험료율 적용 (2026년 개정 반영)
         const yearRate = getContributionRate(item.year);
         const selfRate = jobType === 'laborer' ? yearRate / 2 : yearRate;
         const monthlyContrib = standardMonthly * selfRate;
         const annualContrib = monthlyContrib * 12;
-        privateContribRow += `<td class="px-3 py-2 text-center text-green-600">${formatCurrency(annualContrib)}<br><span class="text-xs">(월 ${formatCurrency(monthlyContrib)})</span></td>`;
+        privateContribRow += `<td class="px-3 py-2 text-center text-green-600 ${highlightClass}">${formatCurrency(annualContrib)}<br><span class="text-xs">(월 ${formatCurrency(monthlyContrib)})</span></td>`;
       }
       privateContribRow += '</tr>';
 
