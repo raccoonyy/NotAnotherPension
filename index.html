@@ -1170,8 +1170,11 @@
       // 미래 수익률: 과거 수익률이 7.72%보다 낮으면 과거 수익률 유지, 높으면 7.72% 적용
       const baseFutureReturn = product.futureReturn ?? (product.return < FUTURE_RETURN_RATE ? product.return : FUTURE_RETURN_RATE);
       const futureReturn = baseFutureReturn - product.fee;
-      // 과거 데이터 기간 (년)
+      // 과거 데이터 기간 (년) - 참고용
       const returnYears = product.returnYears ?? 10;
+
+      // 현재 연도 기준으로 과거/미래 구분
+      const currentYear = new Date().getFullYear();
 
       let totalContribution = 0;
       let balance = 0;
@@ -1182,7 +1185,7 @@
         const item = incomes[i];
         // 연도별 보험료율 적용 (2026년 개정 반영)
         // 개인연금 납입액 = 국민연금 본인 부담분과 동일
-        const year = item.year ?? new Date().getFullYear();
+        const year = item.year ?? currentYear;
         const fullContributionRate = getContributionRate(year);
         // 근로자는 본인 부담분(절반), 사업자는 전액
         const selfContributionRate = jobType === 'laborer' ? fullContributionRate / 2 : fullContributionRate;
@@ -1191,9 +1194,10 @@
         const standardMonthly = getStandardMonthlyIncome(item.income);
         const annualContribution = standardMonthly * 12 * selfContributionRate;
 
-        // 과거/미래 수익률 구분: 처음 returnYears 년은 과거 수익률, 이후는 미래 수익률
-        const effectiveReturn = i < returnYears ? pastReturn : futureReturn;
-        if (i < returnYears) {
+        // 과거/미래 수익률 구분: 현재 연도 이전은 과거 수익률, 현재 연도 이후는 미래 수익률
+        const isPastYear = year < currentYear;
+        const effectiveReturn = isPastYear ? pastReturn : futureReturn;
+        if (isPastYear) {
           pastYearsUsed++;
         } else {
           futureYearsUsed++;
@@ -1615,12 +1619,22 @@
         // 미래 수익률: 과거 수익률이 7.72%보다 낮으면 과거 수익률 유지, 높으면 7.72% 적용
         const baseFutureRate = pp.futureReturn ?? ((pp.return || 0) < FUTURE_RETURN_RATE ? (pp.return || 0) : FUTURE_RETURN_RATE);
         const futureRate = (baseFutureRate * 100).toFixed(1);
-        const returnYears = pp.returnYears ?? 10;
-        // 과거와 미래 수익률이 같으면 화살표 없이 표시
-        const returnInfo = pp.returnYears
-          ? (pastRate === futureRate ? `${returnYears}년 ${pastRate}%` : `${returnYears}년 ${pastRate}% → ${futureRate}%`)
-          : `고정 ${pastRate}%`;
-        headerRow += `<th class="px-2 py-2 text-center font-medium text-gray-700 min-w-[160px]" title="${pp.productName}\n과거 ${returnYears}년 수익률: ${pastRate}%\n미래 예상 수익률: ${futureRate}%">${displayName}<br><span class="text-xs text-gray-500">(${returnInfo})</span></th>`;
+        // 실제 적용된 과거/미래 연수 사용
+        const pastYears = pp.pastYearsUsed ?? 0;
+        const futureYears = pp.futureYearsUsed ?? 0;
+        // 수익률 정보 표시: 과거 연수가 0이면 미래만, 아니면 과거→미래
+        let returnInfo;
+        if (pastYears === 0) {
+          // 30세처럼 과거가 없는 경우: 미래 수익률만 표시
+          returnInfo = `${futureYears}년 ${futureRate}%`;
+        } else if (pastRate === futureRate) {
+          // 과거와 미래 수익률이 같은 경우
+          returnInfo = `${pastYears + futureYears}년 ${pastRate}%`;
+        } else {
+          // 과거와 미래 수익률이 다른 경우
+          returnInfo = `${pastYears}년 ${pastRate}% → ${futureRate}%`;
+        }
+        headerRow += `<th class="px-2 py-2 text-center font-medium text-gray-700 min-w-[160px]" title="${pp.productName}\n과거 ${pastYears}년 수익률: ${pastRate}%\n미래 ${futureYears}년 예상 수익률: ${futureRate}%">${displayName}<br><span class="text-xs text-gray-500">(${returnInfo})</span></th>`;
       }
       headerRow += '</tr>';
 
