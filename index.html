@@ -1316,6 +1316,55 @@
     // ============================================================
 
     /**
+     * 상품 정보 팝오버 표시
+     * @param {Event} event - 클릭 이벤트
+     * @param {Object} productData - 상품 데이터
+     */
+    function showProductPopover(event, productData) {
+      event.stopPropagation();
+      const popover = document.getElementById('product-popover');
+      const content = document.getElementById('popover-content');
+
+      // 과거 수익률 표시 (0년이면 숨김)
+      const pastRateHtml = productData.pastYears > 0
+        ? `<div class="flex justify-between"><span class="text-gray-500">과거 수익률:</span> <span class="font-medium">${productData.pastRate}%</span> <span class="text-gray-400">(${productData.pastYears}년)</span></div>`
+        : '';
+
+      content.innerHTML = `
+        <div class="font-bold text-gray-800 mb-3 pb-2 border-b border-gray-200">${productData.name}</div>
+        <div class="text-sm space-y-2">
+          ${pastRateHtml}
+          <div class="flex justify-between"><span class="text-gray-500">미래 수익률:</span> <span class="font-medium text-blue-600">${productData.futureRate}%</span> <span class="text-gray-400">(${productData.futureYears}년)</span></div>
+          <div class="flex justify-between"><span class="text-gray-500">수수료:</span> <span class="font-medium">${productData.fee}%</span></div>
+        </div>
+      `;
+
+      // 위치 계산 (클릭한 요소 아래에 표시)
+      const rect = event.currentTarget.getBoundingClientRect();
+      popover.style.top = `${rect.bottom + window.scrollY + 8}px`;
+      popover.style.left = `${Math.max(8, rect.left + window.scrollX - 50)}px`;
+      popover.classList.remove('hidden');
+    }
+
+    /**
+     * 상품 정보 팝오버 숨기기
+     */
+    function hideProductPopover() {
+      const popover = document.getElementById('product-popover');
+      if (popover) {
+        popover.classList.add('hidden');
+      }
+    }
+
+    // 팝오버 외부 클릭 시 닫기
+    document.addEventListener('click', (e) => {
+      const popover = document.getElementById('product-popover');
+      if (popover && !popover.contains(e.target) && !e.target.closest('.product-header-cell')) {
+        hideProductPopover();
+      }
+    });
+
+    /**
      * 숫자를 한국 원화 형식으로 포맷
      * @param {number} amount - 금액
      * @param {string} unit - 단위 ('원' | '만원')
@@ -1638,6 +1687,8 @@
         // 실제 적용된 과거/미래 연수 사용
         const pastYears = pp.pastYearsUsed ?? 0;
         const futureYears = pp.futureYearsUsed ?? 0;
+        // 수수료
+        const feeRate = ((pp.fee || 0) * 100).toFixed(2);
         // 수익률 정보 표시: 과거 연수가 0이면 미래만, 아니면 과거→미래
         let returnInfo;
         if (pastYears === 0) {
@@ -1650,7 +1701,16 @@
           // 과거와 미래 수익률이 다른 경우
           returnInfo = `${pastYears}년 ${pastRate}% → ${futureRate}%`;
         }
-        headerRow += `<th class="px-2 py-2 text-center font-medium text-gray-700 min-w-[160px]" title="${pp.productName}\n과거 ${pastYears}년 수익률: ${pastRate}%\n미래 ${futureYears}년 예상 수익률: ${futureRate}%">${displayName}<br><span class="text-xs text-gray-500">(${returnInfo})</span></th>`;
+        // 팝오버용 상품 데이터 (JSON 이스케이프)
+        const productData = JSON.stringify({
+          name: pp.productName,
+          pastRate: pastRate,
+          futureRate: futureRate,
+          pastYears: pastYears,
+          futureYears: futureYears,
+          fee: feeRate
+        }).replace(/"/g, '&quot;');
+        headerRow += `<th class="px-2 py-2 text-center font-medium text-gray-700 min-w-[160px] cursor-pointer hover:bg-gray-200 product-header-cell" onclick="showProductPopover(event, ${productData})">${displayName}<br><span class="text-xs text-gray-500">(${returnInfo})</span></th>`;
       }
       headerRow += '</tr>';
 
@@ -2485,5 +2545,10 @@
     // 테스트를 전역에서 실행 가능하도록 노출
     window.runTests = runTests;
   </script>
+
+  <!-- 상품 정보 팝오버 -->
+  <div id="product-popover" class="hidden fixed z-50 bg-white border border-gray-300 rounded-lg shadow-lg p-4 max-w-xs">
+    <div id="popover-content"></div>
+  </div>
 </body>
 </html>
