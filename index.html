@@ -1389,13 +1389,29 @@
           color: 'blue',
           tooltip: `세전: ${formatCurrency(npsMonthlyAt65)}\n총 수령액: ${formatCurrency(npsTotalReceiving)}`
         },
-        ...topPensions.map((pp, index) => ({
-          title: pp.productName.length > 12 ? pp.productName.substring(0, 12) + '...' : pp.productName,
-          amount: pp.netAmountAt65,
-          totalReceiving: pp.totalReceiving,
-          color: index === 0 ? 'green' : index === 1 ? 'purple' : 'gray',
-          tooltip: `${pp.productName}\n세전: ${formatCurrency(pp.monthlyAt65)}\n수익률: ${((pp.return || 0) * 100).toFixed(1)}%\n총 수령액: ${formatCurrency(pp.totalReceiving)}`
-        }))
+        ...topPensions.map((pp, index) => {
+          // 실제 적용된 과거/미래 연수 기반 수익률 정보
+          const pastYears = pp.pastYearsUsed ?? 0;
+          const futureYears = pp.futureYearsUsed ?? 0;
+          const pastRate = ((pp.return || 0) * 100).toFixed(1);
+          const baseFutureRate = pp.futureReturn ?? ((pp.return || 0) < FUTURE_RETURN_RATE ? (pp.return || 0) : FUTURE_RETURN_RATE);
+          const futureRate = (baseFutureRate * 100).toFixed(1);
+          let returnInfo;
+          if (pastYears === 0) {
+            returnInfo = `${futureYears}년 ${futureRate}%`;
+          } else if (pastRate === futureRate) {
+            returnInfo = `${pastYears + futureYears}년 ${pastRate}%`;
+          } else {
+            returnInfo = `${pastYears}년 ${pastRate}% → ${futureRate}%`;
+          }
+          return {
+            title: pp.productName.length > 12 ? pp.productName.substring(0, 12) + '...' : pp.productName,
+            amount: pp.netAmountAt65,
+            totalReceiving: pp.totalReceiving,
+            color: index === 0 ? 'green' : index === 1 ? 'purple' : 'gray',
+            tooltip: `${pp.productName}\n세전: ${formatCurrency(pp.monthlyAt65)}\n수익률: ${returnInfo}\n총 수령액: ${formatCurrency(pp.totalReceiving)}`
+          };
+        })
       ];
 
       grid.innerHTML = cards.map(card => `
